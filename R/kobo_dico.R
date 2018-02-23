@@ -4,9 +4,7 @@
 #'
 #' @description  Produce a data dictionnary based on the xlsform for the project
 #'
-#' @param form The full filename of the form to be accessed (xls or xlsx file).
-#' It is assumed that the form is stored in the data folder.
-#'
+#' @param mainDir
 #'
 #' @return A "data.table" with the full data dictionnary. To be used in the rest of the analysis.
 #'
@@ -23,11 +21,15 @@
 #' @export kobo_dico
 #'
 
-kobo_dico <- function() {
-  source("code/0-config.R")
+kobo_dico <- function(mainDir='') {
+  if (mainDir==''){
+    mainDir <- getwd()
+  }
 
+  source(paste0(mainDir,"/code/0-config.R"), local=TRUE)
+  data <- read_excel(path.to.data, sheet=sheet)
   # read the survey tab of ODK from
-  form_tmp <- paste0("data/",form)
+  form_tmp <- paste0(mainDir, "/data/",form)
 
   ###############################################################################################
   ### First review all questions first
@@ -267,8 +269,8 @@ kobo_dico <- function() {
   dico <- dico[ !is.na(dico$name), ]
   dico <- dico[ !is.na(dico$type), ]
 
-  write.csv(dico, paste0("data/dico_",form,".csv"), row.names=FALSE, na = "")
-  path.to.dico <- paste0("data/dico_",form,".csv")
+  write.csv(dico, paste0(mainDir,"/data/dico_",form,".csv"), row.names=FALSE, na = "")
+  path.to.dico <- paste0(mainDir,"/data/dico_",form,".csv")
 
  # f_csv(dico)
 #  return(dico)
@@ -290,14 +292,13 @@ cat("###########################################################################
 
 
 #Fetching the directory
-mainDir <- getwd()
 #Path to file
 configfile<-paste(mainDir,"/code/0-config.R",sep="")
 #Writting file
 sink(configfile,append=TRUE)
 cat("\n ### Name of the dictionnary: \n")
 
-cat(paste('path.to.dico <- paste("data/dico_',form,'.csv",sep="") \n',sep=""))
+cat(paste('path.to.dico <- paste("',mainDir,'/data/dico_',form,'.csv",sep="") \n',sep=""))
 cat("\n")
 cat(paste('dico <- read.csv("',path.to.dico,'", sep=",") \n',sep = ""))
 

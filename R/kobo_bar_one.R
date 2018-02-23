@@ -5,7 +5,7 @@
 #' @description  Automatically generate bar chart for each of the select_one question in the dataset. ggplot2 is used.
 #'
 #'
-#'
+#' @param mainDir Path to the project's working directory
 #'
 #'
 #' @author Edouard Legoupil, Elliott Messeiller
@@ -21,8 +21,13 @@
 #'
 #'
 
-kobo_bar_one <- function() {
-  source("code/0-config.R")
+kobo_bar_one <- function(mainDir='') {
+  if (mainDir==''){
+    mainDir <- getwd()
+  }
+
+  source(paste0(mainDir,"/code/0-config.R"), local=TRUE)
+  data <- read_excel(path.to.data, sheet=sheet)
 
   mainDir <- "out"
   subDir <- "bar_one"
@@ -99,8 +104,12 @@ kobo_bar_one <- function() {
         print(i)
       } else{
 
-
-      frequ <- data.frame(svytable(~data.single[[i]], surveydesign))
+      if (usedweight=="sampling_frame"){
+        frequ <- data.frame(svytable(~data.single[[i]], surveydesign))
+      }
+      else{
+        frequ<-data.frame(table(data.single[,i]))
+      }
       names(frequ)<- c("Var1","Freq")
 
       frequ$freqper <- as.numeric(frequ$Freq/sum(frequ$Freq))

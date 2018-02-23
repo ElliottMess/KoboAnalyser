@@ -117,6 +117,40 @@ kobo_projectinit <- function() {
   if (!file.exists(destfile)) {
     file.copy(paste(path_correct,"/KoboAnalyser/script//report.Rmd",sep=""), destfile)
   }
+  destfile=paste0(mainDir,"/code/3-create-indicators.R")
+  if (!file.exists(destfile)) {
+    file.copy(paste(path_correct,"/KoboAnalyser/script//3-create-indicators.R",sep=""), destfile)
+  }
+
+  subsubDir <- "shiny_examples"
+  if (file.exists(paste(mainDir, subDir,"/",subsubDir,"/", sep = "/", collapse = "/"))) {
+    cat("shiny_examples exists in subDir and is a directory.\n")
+  } else if (file.exists(paste(mainDir, subDir, subsubDir, sep = "/", collapse = "/"))) {
+    cat("shiny_examples directory exists in your project directory.\n")
+    # you will probably want to handle this separately
+  } else {
+    cat("shiny_examples directory does not exist in your project directory - creating now!\n ")
+    dir.create(file.path(mainDir, subDir,subsubDir))
+  }
+
+  destfile=paste0(mainDir,"/code/shiny_examples/app_projectconfig.R")
+    file.copy(paste(path_correct,"/KoboAnalyser/shiny_examples//app_projectconfig.R",sep=""), destfile, overwrite = TRUE)
+
+
+  subsubsubDir <- "www"
+  if (file.exists(paste(mainDir, subDir,"/",subsubDir,"/",subsubsubDir, "/",sep = "/", collapse = "/"))) {
+    cat("www exists in subDir and is a directory.\n")
+  } else if (file.exists(paste(mainDir, subDir, subsubDir,subsubsubDir, sep = "/", collapse = "/"))) {
+    cat("www directory exists in your project directory.\n")
+    # you will probably want to handle this separately
+  } else {
+    cat("www directory does not exist in your project directory - creating now!\n ")
+    dir.create(file.path(mainDir, subDir,subsubDir,subsubsubDir))
+  }
+  destfile=paste0(mainDir,"/code/shiny_examples/www/exportformat.png")
+  if (!file.exists(destfile)) {
+    file.copy(paste(path_correct,"/KoboAnalyser/shiny_examples/www//exportformat.png",sep=""), destfile)
+  }
 
 
   subDir <- "data"

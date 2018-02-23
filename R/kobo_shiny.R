@@ -20,6 +20,7 @@
 #'
 #'
 kobo_shiny <- function(app="") {
+  mainDir <- getwd()
 
   validApps <- list.files(system.file("shiny_examples", package = "KoboAnalyser"))
 
@@ -38,8 +39,7 @@ kobo_shiny <- function(app="") {
   }
 
   # find and launch the app
-  appDir <- system.file("shiny_examples/", app, package = "KoboAnalyser")
-  setwd(dir)
-  shiny::shinyAppDir(".")
+  appDir <- paste0(mainDir,"/code/shiny_examples/",app)
+  shiny::runApp(appDir, display.mode = "normal")
 }
 NULL

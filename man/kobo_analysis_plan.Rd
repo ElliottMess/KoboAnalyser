@@ -4,7 +4,7 @@
 \alias{kobo_analysis_plan}
 \title{Import the data analysis plan from the XLS form}
 \usage{
-kobo_analysis_plan()
+kobo_analysis_plan(mainDir = "")
 }
 \value{
 A file with all elements to get your data & form.

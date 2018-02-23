@@ -4,7 +4,7 @@
 \alias{kobo_weight}
 \title{Weight the data}
 \usage{
-kobo_weight()
+kobo_weight(mainDir = "")
 }
 \description{
 Automatically weight the data according to the information of 0-config.R

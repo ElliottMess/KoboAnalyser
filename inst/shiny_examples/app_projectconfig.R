@@ -1,11 +1,12 @@
 
 library(shiny)
 library(readxl)
-source("code/0-packages.R")
-kobo_projectinit()
-mainDir <- getwd()
 
-ui <- fluidPage(
+
+
+ui <-
+
+  fluidPage(
 
 
   tabsetPanel(
@@ -142,8 +143,7 @@ ui <- fluidPage(
         uiOutput("dico"),
         br(),
         br(),
-        htmlOutput("dicomessage"),
-        print(mainDir)
+        htmlOutput("dicomessage")
 
 
 
@@ -167,7 +167,10 @@ ui <- fluidPage(
     )
   )
 )
+
 server <- function(input, output,session) {
+  mainDir <-getwd()
+  mainDir <- dirname(dirname(mainDir))
 
     #Move the data and form to the data folder
   observeEvent(input$upload_files,{
@@ -195,13 +198,13 @@ server <- function(input, output,session) {
     cat("### 1. Form   ###\n")
     cat(paste("form<-'",inFile_form$name,"'",sep=""))
     cat("\n")
-    cat(paste('path.to.form <- paste("data/',inFile_form$name,'",sep="") \n',sep=""))
+    cat(paste('path.to.form <- paste("',mainDir,'/data/',inFile_form$name,'",sep="") \n',sep=""))
     cat("\n")
     cat("\n### 2. Main dataframe  ###\n")
-    cat(paste('path.to.data <- paste("data/',inFile_data$name,'",sep="") \n',sep=""))
+    cat(paste('path.to.data <- paste("',mainDir,'/data/',inFile_data$name,'",sep="") \n',sep=""))
     cat(paste('datafile <-"',inFile_data$name,'"',sep=""))
     cat("\n")
-    cat(paste('data <- read_excel("data/',inFile_data$name,'", sheet="',inFile_sheet,'")',sep=""))
+    cat(paste('sheet <- "',inFile_sheet,'"',sep=""))
     cat("\n")
     cat("### 1. Weighting system   ###\n")
     cat(paste("usedweight<-'",inFile_weight,"'",sep=""))
@@ -221,6 +224,9 @@ server <- function(input, output,session) {
     cat("\n")
     cat(paste('organisation <-"',inFile_organisation,'"',sep=""))
     cat("\n")
+    cat(paste('mainDir <- "',mainDir,'"',sep=""))
+    cat("\n")
+
     sink()
     output$textmessage <- renderUI(HTML(paste(p(strong("Files uploaded and config files written")),p("Now, build the dictionnary to link the form with the data"))))
     output$dico <- renderUI({
@@ -232,8 +238,19 @@ server <- function(input, output,session) {
   })
 
   observeEvent(input$dico,{
-    kobo_dico()
-    output$dicomessage <- renderUI(HTML(paste(p(strong("Dictionnary built!"), p("All good, now go to the ",strong("'output' tab!"))))))
+    isolate({source(paste0(mainDir,"/code/0-config.R"), local=TRUE)})
+
+    kobo_dico(mainDir)
+
+    if(input$analysis_plan=='y'){
+      kobo_analysis_plan(mainDir)
+    }
+
+    if(input$weighting_sys!='none'){
+      kobo_weight(mainDir)
+    }
+
+    output$dicomessage <- renderUI(HTML(paste(p(strong("Dictionnary built, data weighted, and analysis_plan applied!"), p("All good, now go to the ",strong("'output' tab!"))))))
 
   })
 
@@ -267,9 +284,8 @@ server <- function(input, output,session) {
       )
     }
   )
-
-
-
 }
+
+
 
 shinyApp(ui = ui, server = server)
