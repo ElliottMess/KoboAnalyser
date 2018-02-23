@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "Package: KoboAnalyser\nType: Package\nTitle: KoboAnalyser, data discovery and analysis for data collected through the KoboToolbox.\nVersion: 0.1.4\nAuthors@R: person(\"Elliott\", \"Messeiller\", email = \"elliott.messeiller@acted.org\",\n  role = c(\"aut\", \"cre\"))\nDescription: Run analysis for data collected through the KoboToolbox.\n    Largely based on KoboloadeR (https://github.com/Edouard-Legoupil/koboloadeR) by Edouard Legoupil.\nLicense: GPL-3\nLazyData: TRUE\nDepends:\nRoxygenNote: 6.0.1\n",
+    "created" : 1519297163131.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2051837751",
+    "id" : "63049AD9",
+    "lastKnownWriteTime" : 1519293669,
+    "last_content_update" : 1519293669,
+    "path" : "~/ACTED Afghanistan/8. AME/1. Guidelines and tools/11. Kobo/KoboAnalyser/KoboAnalyser/DESCRIPTION",
+    "project_path" : "DESCRIPTION",
+    "properties" : {
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "dcf"
+}

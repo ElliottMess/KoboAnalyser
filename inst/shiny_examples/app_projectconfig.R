@@ -1,0 +1,275 @@
+
+library(shiny)
+library(readxl)
+source("code/0-packages.R")
+kobo_projectinit()
+mainDir <- getwd()
+
+ui <- fluidPage(
+
+
+  tabsetPanel(
+
+      tabPanel("Introduction",
+            fluidRow(
+              h1("Welcome to KoboAnalyser!", align="center"),
+              p("This tool will allow to explore your data collected through Kobo. ", align="center"),
+              column(5,
+                  h2("Content of the tool"),
+                  tags$ol(
+                    tags$li(strong("Introduction")," (where you are right now): explaination of the main features of the  and a few instructions"),
+                    tags$li(strong("Project configuration:")," uploading your form and data"),
+                    tags$li(strong("Output:")," uploading your form and data")
+                  ),
+                  br(),
+                  p("You can access those with the tabulations on the top of the page.",strong(" Watch out"), "Project configuration is needed !")
+
+
+              ),
+              column(5, offset = 1,
+                     h2("Features"),
+                     tags$ol(
+                      tags$li(strong("Generate a data exploration report")," with bar graphs, summary and crosstabulation for all the questions in your form, including one disaggregation and your data analysis plan."),
+                      tags$li(strong("Generate bar graphs")," for all the questions in your form, including with one disaggregation"),
+                      tags$li(strong("Weight")," your data according to your sammpling frame"),
+                      tags$li(strong("Calculate indicators:")," add variables with the data analysis plan.")
+                     ),
+                     br(),
+                     p("You can access those with the 'Output' tab on the top of the page.",strong(" Watch out"), "Project configuration is needed !")
+
+
+              )
+            ),
+            br(),
+            br(),
+            fluidRow(
+              column(12, offset = 5,
+              h2("  Instruction")
+              ),
+              column(5,
+                h3("Export data from Kobo"),
+                p("Both your form and data should be downloaded directly from kobo."),
+                p("When exporting your data from Kobo:"),
+                tags$ol(
+                  tags$li("Select 'export type' as XLS"),
+                  tags$li('XML values and headers'),
+                  tags$li('Include groups in headers'),
+                  tags$li("and 'Group seperator' as dot ('.') (see image below) ")
+                ),
+                p(strong("DO NOT"),"change the name of the columns or any cells in the data. Everything should be exactly as in the form."),
+                img(src="exportformat.png", width=200)
+              ),
+              column(5, offset = 1,
+                  h3("Use the XLSform template supplied"),
+                     p("In the folder 'code', you will find a XLSform template.",
+                       br(),
+                       "You will see that this template has three extra sheets:",
+                       tags$ol(
+                         tags$li("'analysis_plan': where you can define your indicators or new variables if need"),
+                         tags$li("'sampling_frame': where you can specify your sampling frame to weight your data according to the method given in Project Configuration"),
+                         tags$li("'instruction': help on how to fill the new XLSform.")
+                       ),
+                       "Please see the 'instruction' on how to setup your XLSform for KoboAnalyser")
+
+                       )
+                     )
+
+      ),
+
+      tabPanel("Project configuration",
+
+      titlePanel("Configuring a few elements for your project"),
+
+
+      mainPanel(
+
+      fluidRow(
+      #list files in "data" and make dropdown of choices. then select sheets to be used for data, analysis plan and sampling
+      column(5,
+        fileInput("datafile", label = h4("Select the file with the data"),accept = c(".xlsx",".xls",".csv")),
+        uiOutput("data_sheet")
+      ),
+      column(5, offset = 2,
+        fileInput("form", label = h4("Select the file with the form"),accept = c(".xlsx"))
+      )),
+
+      fluidRow(
+        column(5,
+          radioButtons("weighting_sys", h4("What kind of weighting system did you use?"),
+                       choices = c("None"="none",
+                                   "Sampling Frame"="sampling_frame",
+                                   "Custom"="custom"))
+        ),
+        column(4,
+          conditionalPanel(condition='input.weighting_sys=="sampling_frame"',
+                           radioButtons("sampling", h5("What kind of sampling methode did you use?"),
+                                        choices = c("Simple random"="simple_random",
+                                                    "2 stages random -st1"="2_stages",
+                                                    "cluster sampling"="cluster_sampling"))
+                           )
+          )
+        ),
+      fluidRow(
+        radioButtons("analysis_plan", h4("Did you use the analysis plan sheet?"),
+                     choices = c("No"="n",
+                                 "Yes"="y")),
+        uiOutput("files_uploaded")
+
+
+      ),
+      fluidRow(
+
+        h2("Information about the report"),
+        column(5,
+        textInput("report_name", "Name of the report"),
+        textInput("location", "Where is the report written")
+        ),
+        column(5,
+        textInput("author", "What is your name (author)?"),
+        textInput("organisation", "What is your organisation?")
+        )
+      )
+      ),
+      sidebarPanel(
+        h3("When you are all set, upload the files!"),
+        br(),
+        actionButton("upload_files",label = "Upload files"),
+        br(),
+        br(),
+        htmlOutput("textmessage"),
+        br(),
+        br(),
+        uiOutput("dico"),
+        br(),
+        br(),
+        htmlOutput("dicomessage"),
+        print(mainDir)
+
+
+
+      )
+    ),
+
+    tabPanel("Output",
+        titlePanel("Output"),
+        sidebarLayout(position="left",
+          mainPanel(
+
+          ),
+
+          sidebarPanel(
+            h4("Download outputs"),
+            downloadButton("report", "Generate report")
+
+          )
+        )
+
+    )
+  )
+)
+server <- function(input, output,session) {
+
+    #Move the data and form to the data folder
+  observeEvent(input$upload_files,{
+    inFile_data <- input$datafile
+    file.copy(inFile_data$datapath,file.path(mainDir,"/data/",inFile_data$name),overwrite = T)
+    inFile_form <- input$form
+    file.copy(inFile_form$datapath,file.path(mainDir,"/data/",inFile_form$name),overwrite = T)
+    inFile_sheet <- input$data_sheet
+    inFile_weight <- input$weighting_sys
+    inFile_analysis <- input$analysis_plan
+    inFile_sampling <- input$sampling
+    inFile_report <- input$report_name
+    inFile_location <- input$location
+    inFile_author <- input$author
+    inFile_organisation <- input$organisation
+
+    #Path to file
+    configfile<-paste(mainDir,"/code/0-config.R",sep="")
+    #Writting file
+    sink(configfile)
+    cat("#### Config file ###\n")
+    cat("\n")
+    cat("### Can be manualy edited or interactively rewritten using the function kobo_projectconfig() or kobo_shiny('app_projectconfig.R') \n")
+    cat("\n")
+    cat("### 1. Form   ###\n")
+    cat(paste("form<-'",inFile_form$name,"'",sep=""))
+    cat("\n")
+    cat(paste('path.to.form <- paste("data/',inFile_form$name,'",sep="") \n',sep=""))
+    cat("\n")
+    cat("\n### 2. Main dataframe  ###\n")
+    cat(paste('path.to.data <- paste("data/',inFile_data$name,'",sep="") \n',sep=""))
+    cat(paste('datafile <-"',inFile_data$name,'"',sep=""))
+    cat("\n")
+    cat(paste('data <- read_excel("data/',inFile_data$name,'", sheet="',inFile_sheet,'")',sep=""))
+    cat("\n")
+    cat("### 1. Weighting system   ###\n")
+    cat(paste("usedweight<-'",inFile_weight,"'",sep=""))
+    cat("\n")
+    cat("####### 3.1 - Type of sampling used ###\n")
+    cat(paste('usedsampling <-"',inFile_sampling,'"',sep=""))
+    cat("\n")
+    cat("###  4.- Used the data analysis plan\n")
+    cat(paste('analysis_plan <-"',inFile_analysis,'"',sep=""))
+    cat("\n")
+    cat("###  5. General info on the project\n")
+    cat(paste('report_name <-"',inFile_report,'"',sep=""))
+    cat("\n")
+    cat(paste('location <-"',inFile_location,'"',sep=""))
+    cat("\n")
+    cat(paste('author <-"',inFile_author,'"',sep=""))
+    cat("\n")
+    cat(paste('organisation <-"',inFile_organisation,'"',sep=""))
+    cat("\n")
+    sink()
+    output$textmessage <- renderUI(HTML(paste(p(strong("Files uploaded and config files written")),p("Now, build the dictionnary to link the form with the data"))))
+    output$dico <- renderUI({
+
+      actionButton("dico",label = "Build dictionnary")
+
+    })
+
+  })
+
+  observeEvent(input$dico,{
+    kobo_dico()
+    output$dicomessage <- renderUI(HTML(paste(p(strong("Dictionnary built!"), p("All good, now go to the ",strong("'output' tab!"))))))
+
+  })
+
+  output$data_sheet  <- renderUI({
+    inFile <- input$datafile
+      if(is.null(inFile)) return(NULL)
+    data_sheets <- excel_sheets(inFile$datapath)
+    radioButtons("data_sheet","Select the sheet with your data",data_sheets)
+  })
+
+
+  output$report <- downloadHandler(
+    filename = "report.doc",
+    content = function(file) {
+      # Copy the report file to a temporary directory before processing it, in
+      # case we don't have write permissions to the current working dir (which
+      # can happen when deployed).
+      tempReport <- file.path(tempdir(), "report.Rmd")
+      file.copy("report.Rmd", tempReport, overwrite = TRUE)
+
+      # Set up parameters to pass to Rmd document
+      params <- list(n = input$slider)
+
+      # Knit the document, passing in the `params` list, and eval it in a
+      # child of the global environment (this isolates the code in the document
+      # from the code in this app).
+      rmarkdown::render(tempReport, output_file = file,
+                        params = params,
+                        envir = new.env(parent = globalenv())
+
+      )
+    }
+  )
+
+
+
+}
+
+shinyApp(ui = ui, server = server)

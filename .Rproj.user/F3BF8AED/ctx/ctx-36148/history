@@ -1,0 +1,512 @@
+} else {  cat(paste0( length(selectfacet) , " variable(s) to facet in your data analysis plan. Let's proceed! \n"))
+## subset data with selectone
+data.integer <- cbind(data [ selectfacet], data [ selectinteger ])
+## Remove variable where we get only NA
+data.integer <- data.integer[,colSums(is.na(data.integer))<nrow(data.integer)]
+data.integer <- kobo_label(data.integer, dico)
+## loop around the list of variables to facet
+for (i in 1:nrow(selectfacett) ) {
+# i <-1
+facetname <- as.character(selectfacett[i ,1])
+facetlabel <- as.character(dico[dico$fullname==facetname,c("label")])
+### Now let's create dot plot
+for (j in 1:nrow(selectintegert) ) {
+# j <-1
+variablename <- as.character(selectintegert[j,1])
+variablelabel <- as.character(dico[dico$fullname==variablename,c("label")])
+## print sutff
+cat(paste(i," facet ", facetlabel," - ",facetname," \n"  ))
+cat(paste(j," variable ",variablelabel," - ",variablename," \n"))
+### testing that the variable to map is not the same than the variable to facetat!
+## and now the graph
+data.integer[ , j+nrow(selectfacett)] <- as.integer(data.integer[ , j+nrow(selectfacett)])
+ggplot(data.integer, aes(x=data.integer[ , i], y=data.integer[ , j+nrow(selectfacett)]), fill=as.factor(data.integer[ , i])) +
+geom_boxplot( ) +  #notch=TRUE
+scale_size_area(max_size = 10)+
+guides(fill=FALSE) +
+xlab("") +
+ylab("") +
+coord_flip()+
+scale_y_continuous(breaks= pretty_breaks()) +
+#geom_smooth(method=lm) +  # Add a loess smoothed fit curve with confidence region
+ggtitle(paste("Boxplot for question: ", variablelabel,sep=""),
+subtitle = paste("Facetted by question: ",facetlabel,sep=""))+
+theme(plot.title=element_text(face="bold", size=9),
+plot.background = element_rect(fill = "transparent",colour = NA))
+ggsave(filename=paste("out/boxplot/boxplot_",facetname,"_correl_",variablename,".png",sep=""), width=10, height=10,units="in", dpi=300)
+cat(paste0("Generated bar chart for question: ",variablelabel  ," - faceted with with - ",facetlabel,"\n"))
+rm(variablename)
+}
+rm(facetname)
+}
+}
+View(selectdf1)
+source("code/0-config.R")
+data <- read.csv(path.to.data,sep = ";")
+dico <- read.csv(path.to.dico,sep = ",")
+mainDir <- "out"
+subDir <- "boxplot"
+if (file.exists(paste(mainDir, subDir, "/", sep = "/", collapse = "/"))) {
+cat("boxplot directory exists in out directory and is a directory.\n")
+} else if (file.exists(paste(mainDir, subDir, sep = "/", collapse = "/"))) {
+cat("boxplot directory exists in your out directory.\n")
+# you will probably want to handle this separately
+} else {
+cat("boxplot directory does not exist in your out directory - creating now!\n ")
+dir.create(file.path(mainDir, subDir))
+}
+## Check that those variable are in the dataset
+selectdf <- dico[dico$type=="integer" , c("fullname","listname","label","name","variable","disaggregation")]
+check <- as.data.frame(names(data))
+names(check)[1] <- "fullname"
+check$id <- row.names(check)
+selectdf <- join(x=selectdf, y=check, by="fullname",  type="left")
+selectdf <- selectdf[!is.na(selectdf$id), ]
+## now correct list of variables
+selectinteger <- as.character(selectdf[, c("fullname")])
+## df of variable to loop around
+selectintegert <- as.data.frame(selectinteger)
+## Check that those variable are in the dataset
+selectdf1 <- dico[dico$disaggregation!="" & dico$type=="integer" , c("fullname","listname","label","name","variable","disaggregation")]
+selectdf1 <- join(x=selectdf1, y=check, by="fullname",  type="left")
+selectdf1 <- selectdf1[!is.na(selectdf1$id), ]
+## now correct list of variables
+selectfacet <- as.character(selectdf1[, c("fullname")])
+## df of variable to loop around
+selectfacett <- as.data.frame(selectfacet)
+if(length(selectfacet)==0) {
+cat("There's no variable to facet in your data analysis plan.\n")
+} else {  cat(paste0( length(selectfacet) , " variable(s) to facet in your data analysis plan. Let's proceed! \n"))
+## subset data with selectone
+data.integer <- cbind(data [ selectfacet], data [ selectinteger ])
+## Remove variable where we get only NA
+data.integer <- data.integer[,colSums(is.na(data.integer))<nrow(data.integer)]
+data.integer <- kobo_label(data.integer, dico)
+## loop around the list of variables to facet
+for (i in 1:nrow(selectfacett) ) {
+# i <-1
+facetname <- as.character(selectfacett[i ,1])
+facetlabel <- as.character(dico[dico$fullname==facetname,c("label")])
+### Now let's create dot plot
+for (j in 1:nrow(selectintegert) ) {
+# j <-1
+variablename <- as.character(selectintegert[j,1])
+variablelabel <- as.character(dico[dico$fullname==variablename,c("label")])
+## print sutff
+cat(paste(i," facet ", facetlabel," - ",facetname," \n"  ))
+cat(paste(j," variable ",variablelabel," - ",variablename," \n"))
+### testing that the variable to map is not the same than the variable to facetat!
+## and now the graph
+data.integer[ , j+nrow(selectfacett)] <- as.integer(data.integer[ , j+nrow(selectfacett)])
+ggplot(data.integer, aes(x=data.integer[ , i], y=data.integer[ , j+nrow(selectfacett)]), fill=as.factor(data.integer[ , i])) +
+geom_boxplot( ) +  #notch=TRUE
+scale_size_area(max_size = 10)+
+guides(fill=FALSE) +
+xlab("") +
+ylab("") +
+coord_flip()+
+scale_y_continuous(breaks= pretty_breaks()) +
+#geom_smooth(method=lm) +  # Add a loess smoothed fit curve with confidence region
+ggtitle(paste("Boxplot for question: ", variablelabel,sep=""),
+subtitle = paste("Facetted by question: ",facetlabel,sep=""))+
+theme(plot.title=element_text(face="bold", size=9),
+plot.background = element_rect(fill = "transparent",colour = NA))
+ggsave(filename=paste("out/boxplot/boxplot_",facetname,"_correl_",variablename,".png",sep=""), width=10, height=10,units="in", dpi=300)
+cat(paste0("Generated bar chart for question: ",variablelabel  ," - faceted with with - ",facetlabel,"\n"))
+rm(variablename)
+}
+rm(facetname)
+}
+}
+kobo_dico()
+kobo_dico()
+source("code/0-config.R")
+data <- read.csv(path.to.data,sep = ";")
+dico <- read.csv(path.to.dico,sep = ",")
+mainDir <- "out"
+subDir <- "boxplot"
+if (file.exists(paste(mainDir, subDir, "/", sep = "/", collapse = "/"))) {
+cat("boxplot directory exists in out directory and is a directory.\n")
+} else if (file.exists(paste(mainDir, subDir, sep = "/", collapse = "/"))) {
+cat("boxplot directory exists in your out directory.\n")
+# you will probably want to handle this separately
+} else {
+cat("boxplot directory does not exist in your out directory - creating now!\n ")
+dir.create(file.path(mainDir, subDir))
+}
+## Check that those variable are in the dataset
+selectdf <- dico[dico$type=="integer" , c("fullname","listname","label","name","variable","disaggregation")]
+check <- as.data.frame(names(data))
+names(check)[1] <- "fullname"
+check$id <- row.names(check)
+selectdf <- join(x=selectdf, y=check, by="fullname",  type="left")
+selectdf <- selectdf[!is.na(selectdf$id), ]
+## now correct list of variables
+selectinteger <- as.character(selectdf[, c("fullname")])
+## df of variable to loop around
+selectintegert <- as.data.frame(selectinteger)
+## Check that those variable are in the dataset
+selectdf1 <- dico[dico$disaggregation!="" & dico$type=="integer" , c("fullname","listname","label","name","variable","disaggregation")]
+selectdf1 <- join(x=selectdf1, y=check, by="fullname",  type="left")
+selectdf1 <- selectdf1[!is.na(selectdf1$id), ]
+## now correct list of variables
+selectfacet <- as.character(selectdf1[, c("fullname")])
+## df of variable to loop around
+selectfacett <- as.data.frame(selectfacet)
+if(length(selectfacet)==0) {
+cat("There's no variable to facet in your data analysis plan.\n")
+} else {  cat(paste0( length(selectfacet) , " variable(s) to facet in your data analysis plan. Let's proceed! \n"))
+## subset data with selectone
+data.integer <- cbind(data [ selectfacet], data [ selectinteger ])
+## Remove variable where we get only NA
+data.integer <- data.integer[,colSums(is.na(data.integer))<nrow(data.integer)]
+data.integer <- kobo_label(data.integer, dico)
+## loop around the list of variables to facet
+for (i in 1:nrow(selectfacett) ) {
+# i <-1
+facetname <- as.character(selectfacett[i ,1])
+facetlabel <- as.character(dico[dico$fullname==facetname,c("label")])
+### Now let's create dot plot
+for (j in 1:nrow(selectintegert) ) {
+# j <-1
+variablename <- as.character(selectintegert[j,1])
+variablelabel <- as.character(dico[dico$fullname==variablename,c("label")])
+## print sutff
+cat(paste(i," facet ", facetlabel," - ",facetname," \n"  ))
+cat(paste(j," variable ",variablelabel," - ",variablename," \n"))
+### testing that the variable to map is not the same than the variable to facetat!
+## and now the graph
+data.integer[ , j+nrow(selectfacett)] <- as.integer(data.integer[ , j+nrow(selectfacett)])
+ggplot(data.integer, aes(x=data.integer[ , i], y=data.integer[ , j+nrow(selectfacett)]), fill=as.factor(data.integer[ , i])) +
+geom_boxplot( ) +  #notch=TRUE
+scale_size_area(max_size = 10)+
+guides(fill=FALSE) +
+xlab("") +
+ylab("") +
+coord_flip()+
+scale_y_continuous(breaks= pretty_breaks()) +
+#geom_smooth(method=lm) +  # Add a loess smoothed fit curve with confidence region
+ggtitle(paste("Boxplot for question: ", variablelabel,sep=""),
+subtitle = paste("Facetted by question: ",facetlabel,sep=""))+
+theme(plot.title=element_text(face="bold", size=9),
+plot.background = element_rect(fill = "transparent",colour = NA))
+ggsave(filename=paste("out/boxplot/boxplot_",facetname,"_correl_",variablename,".png",sep=""), width=10, height=10,units="in", dpi=300)
+cat(paste0("Generated bar chart for question: ",variablelabel  ," - faceted with with - ",facetlabel,"\n"))
+rm(variablename)
+}
+rm(facetname)
+}
+}
+source("code/0-config.R")
+data <- read.csv(path.to.data,sep = ";")
+dico <- read.csv(path.to.dico,sep = ",")
+mainDir <- "out"
+subDir <- "disagg_one"
+if (file.exists(paste(mainDir, subDir, "/", sep = "/", collapse = "/"))) {
+cat("disagg_one directory exists in out directory and is a directory.\n")
+} else if (file.exists(paste(mainDir, subDir, sep = "/", collapse = "/"))) {
+cat("disagg_one directory exists in your out directory.\n")
+# you will probably want to handle this separately
+} else {
+cat("disagg_one directory does not exist in your out directory - creating now!\n ")
+dir.create(file.path(mainDir, subDir))
+}
+## get list of all nominal variables with disaggregation
+selectone <- as.character(dico[dico$type=="select_one", c("fullname")])
+## Check that those variable are in the dataset
+selectdf <- dico[dico$type=="select_one" , c("fullname","listname","label","name","variable","disaggregation")]
+check <- as.data.frame(names(data))
+names(check)[1] <- "fullname"
+check$id <- row.names(check)
+selectdf <- join(x=selectdf, y=check, by="fullname",  type="left")
+selectdf <- selectdf[!is.na(selectdf$id), ]
+## now correct list of variables
+selectone <- as.character(selectdf[selectdf$disaggregation!="", c("fullname")])
+## df of variable to loop around
+selectonet <- as.data.frame(selectone)
+## get list of variables used for faceting
+selectfacet <- as.character(selectdf[selectdf$disaggregation!="" , c("fullname")])
+selectfacet <- selectfacet[!is.na(selectfacet)]
+# Replacing names by labels
+selectchoices_questions <- dico[dico$type=="select_one_d"  , c("listname","name","labelchoice")]
+selectchoices <- unique(dico[dico$type=="select_one_d"  , c("listname","name","labelchoice")])
+selectoneans <-(dico[dico$type=="select_one_d", c("fullname","name","listname")])
+short_ans <- paste(sapply(strsplit(as.character(selectoneans$fullname),".",fixed = TRUE),"[[",1), sapply(strsplit(as.character(selectoneans$fullname),".",fixed = TRUE),"[[",2), sep = ".")
+selectchoices_questions$qname <- short_ans
+data.single <- data [selectone]
+for (j in 1:ncol(data.single)){
+data.single[,j] <- data.frame(selectchoices[,3][match(data.single[,j],selectchoices[,2])], stringsAsFactors = FALSE)
+data.single[,j] <- factor(data.single[,j])
+}
+if(length(selectfacet)==0) {
+cat("There's no variable to disaggregate in your data analysis plan.\n")
+} else {  cat(paste0( length(selectfacet) , " variable(s) to disaggregate in your data analysis plan. Let's proceed! \n"))
+selectfacett <- selectdf[selectdf$disaggregation!="" , c("fullname","disaggregation")]
+single.facet <- as.data.frame(table(selectfacett[,2]))
+single.facet <- as.data.frame(single.facet[single.facet$Var1!="",c("Var1")])
+names(single.facet) <- "Var1"
+data.single <- as.data.frame(data.single)
+## Remove variable where we get only NA
+data.single <- kobo_label(data.single, dico)
+data.single[data.single==""]<-NA
+## loop around the list of variables to facet
+for (j in 1:nrow(single.facet) ) {
+# j <- 1
+facetname1 <- as.character(single.facet[j,1])
+facetname <- as.character(selectdf[selectdf$name==facetname1,c("fullname")])
+facetlabel <- as.character(dico[dico$fullname==facetname,c("label")])
+selectonefacet <- as.character(selectdf[selectdf$disaggregation==facetname1, c("fullname")])
+selectonefacett <- as.data.frame(selectonefacet)
+### Now let's create proportion graphs -- bar chart
+for (i in 1:nrow(selectonefacett) ) {
+# i <-23
+if(sum(is.na(data.single[,i])==nrow(data.single[,i]))){ cat("passing \n")
+} else {
+variablename <- names(data.single)[i]
+title <- attributes(data.single)$variable.labels[i]
+### testing that the variable to map is not the same than the variable to facet!
+if(facetname==variablename){
+cat("")
+} else {
+#  str(data.single)
+#  str(data.single)
+frequ <- table (data.single[ , i])
+data.single[facetname]<- data[facetname]
+data.single[ , i] <- factor(data.single[ , i], levels=names(frequ[order(frequ, decreasing = TRUE)]))
+data.single[,i] = str_wrap(data.single[,i],width=15)
+count_replied <- paste(round(sum(!is.na(data.single[,i ]))/nrow(data.single)*100,digits=2 ),"%")
+}
+}
+}
+}
+}
+View(frequ)
+frequ <- as.data.frame(table (data.single[ , i]))
+frequ <- as.data.frame(table(data.single[ , i]))
+frequ <- as.data.frame(table(data.single[[i]]))
+frequ$freqper <- round(frequ$Freq/nrow(data.single),digits=2)
+frequ <- frequ[order(frequ$freqper,decreasing = TRUE),]
+frequ$Var1 = str_wrap(frequ$Var1,width=15)
+View(data.single)
+facetname
+data.single[facetname]
+theme_set(theme_gray(base_size = 20))
+ggplot(data.single, aes(x=data.single[ , i])) +
+geom_bar(aes(y = ..count.. / sapply(PANEL, FUN=function(x) sum(count[PANEL == x]))),
+fill="#2a87c8",colour="#2a87c8") +
+guides(fill=FALSE) +
+ylab("Frequency") +
+scale_y_continuous(labels=percent)+
+xlab("") +
+facet_wrap(as.formula(paste("~", facetname)), ncol=2) +
+coord_flip() +
+# coord_fixed() + ##used to maintain the adspect ratio of the plot when it needs to be saved
+ggtitle(wrapper(title,width=65), subtitle = wrapper(paste("Disaggratated by question: ",facetlabel,"\n Response rate to this question:",count_replied,sep=""),width=65))+
+theme(plot.title=element_text(face="bold", size=20),
+plot.background = element_rect(fill = "transparent",colour = NA))
+# Saving graphs
+ggsave(filename=paste("out/disagg_one/bar_one_",variablename,"_disagg_",facetname,".png",sep=""), width=10, height=10,units="in", dpi=300)
+cat(paste0("Generated bar chart for question: ",i, " ", title ," - with disaggregation on - ",j, " ",facetlabel, "  saved as image:   ", variablename,"_disagg_",facetname,"\n"))
+wrapper <- function(x, ...)
+{
+paste(strwrap(x, ...), collapse = "\n")
+}
+## and now the graph
+theme_set(theme_gray(base_size = 20))
+ggplot(data.single, aes(x=data.single[ , i])) +
+geom_bar(aes(y = ..count.. / sapply(PANEL, FUN=function(x) sum(count[PANEL == x]))),
+fill="#2a87c8",colour="#2a87c8") +
+guides(fill=FALSE) +
+ylab("Frequency") +
+scale_y_continuous(labels=percent)+
+xlab("") +
+facet_wrap(as.formula(paste("~", facetname)), ncol=2) +
+coord_flip() +
+# coord_fixed() + ##used to maintain the adspect ratio of the plot when it needs to be saved
+ggtitle(wrapper(title,width=65), subtitle = wrapper(paste("Disaggratated by question: ",facetlabel,"\n Response rate to this question:",count_replied,sep=""),width=65))+
+theme(plot.title=element_text(face="bold", size=20),
+plot.background = element_rect(fill = "transparent",colour = NA))
+# Saving graphs
+ggsave(filename=paste("out/disagg_one/bar_one_",variablename,"_disagg_",facetname,".png",sep=""), width=10, height=10,units="in", dpi=300)
+cat(paste0("Generated bar chart for question: ",i, " ", title ," - with disaggregation on - ",j, " ",facetlabel, "  saved as image:   ", variablename,"_disagg_",facetname,"\n"))
+ggplot(data.single, aes(x=data.single[ , i])) +
+geom_bar(aes(y = ..count.. / sapply(PANEL, FUN=function(x) sum(count[PANEL == x]))),
+fill="#2a87c8",colour="#2a87c8", size=40) +
+guides(fill=FALSE) +
+ylab("Frequency") +
+scale_y_continuous(labels=percent)+
+xlab("") +
+facet_wrap(as.formula(paste("~", facetname)), ncol=2) +
+coord_flip() +
+# coord_fixed() + ##used to maintain the adspect ratio of the plot when it needs to be saved
+ggtitle(wrapper(title,width=65), subtitle = wrapper(paste("Disaggratated by question: ",facetlabel,"\n Response rate to this question:",count_replied,sep=""),width=65))+
+theme(plot.title=element_text(face="bold", size=20),
+plot.background = element_rect(fill = "transparent",colour = NA))
+# Saving graphs
+ggsave(filename=paste("out/disagg_one/bar_one_",variablename,"_disagg_",facetname,".png",sep=""), width=10, height=10,units="in", dpi=300)
+cat(paste0("Generated bar chart for question: ",i, " ", title ," - with disaggregation on - ",j, " ",facetlabel, "  saved as image:   ", variablename,"_disagg_",facetname,"\n"))
+data.single[,i]
+View(data.single[facetname])
+View(data.single)
+data.singlefacet <- data.single[,c(data.single[,i],facetname)]
+data.singlefacet <- data.single[,c(facetname)]
+View(data.singlefacet)
+data.singlefacet
+data.singlefacet$data <- data.single[,i]
+data.singlefacet <- as.data.frame(data.single[,c(facetname)])
+data.singlefacet$data <- data.single[,i]
+frequ <- as.data.frame(table(data.singlefacet))
+frequ$freqper <- round(frequ$Freq/nrow(data.single),digits=2)
+frequ <- frequ[order(frequ$freqper,decreasing = TRUE),]
+frequ$Var1 = str_wrap(frequ$Var1,width=15)
+View(frequ)
+frequ <- as.data.frame(table(data.singlefacet))
+frequ$freqper <- round(frequ$Freq/nrow(data.single),digits=2)
+frequ <- frequ[order(frequ$freqper,decreasing = TRUE),]
+frequ$data = str_wrap(frequ$data,width=15)
+View(frequ)
+frequ$data
+ggplot(frequ, aes(x=data, y=freqper)) +
+geom_bar(fill="#2a87c8",colour="#2a87c8", stat="identity") +
+geom_text(aes(label=paste(round(freqper*100),"%",sep=""), hjust = 1))+
+guides(fill=FALSE) +
+ylab("Frequency") +
+scale_y_continuous(labels=percent)+
+xlab("") +
+facet_wrap(as.formula(paste("~", facetname)), ncol=2) +
+coord_flip() +
+# coord_fixed() + ##used to maintain the adspect ratio of the plot when it needs to be saved
+ggtitle(wrapper(title,width=65), subtitle = wrapper(paste("Disaggratated by question: ",facetlabel,"\n Response rate to this question:",count_replied,sep=""),width=65))+
+theme(plot.title=element_text(face="bold", size=20),
+plot.background = element_rect(fill = "transparent",colour = NA))
+# Saving graphs
+ggsave(filename=paste("out/disagg_one/bar_one_",variablename,"_disagg_",facetname,".png",sep=""), width=10, height=10,units="in", dpi=300)
+cat(paste0("Generated bar chart for question: ",i, " ", title ," - with disaggregation on - ",j, " ",facetlabel, "  saved as image:   ", variablename,"_disagg_",facetname,"\n"))
+View(frequ)
+data.singlefacet <- as.data.frame(data.single[,c(facetname)])
+names(data.singlefacet[,1]) <- facetname
+View(data.singlefacet)
+facetname
+names(data.singlefacet[,1])[1] <- facetname
+View(data.singlefacet)
+facetname
+names(data.singlefacet[,1])[1]
+names(data.singlefacet)[1]
+names(data.singlefacet)[1] <- facetname
+View(data.singlefacet)
+data.singlefacet <- as.data.frame(data.single[,c(facetname)])
+names(data.singlefacet)[1] <- facetname
+data.singlefacet$data <- data.single[,i]
+frequ <- as.data.frame(table(data.singlefacet))
+frequ$freqper <- round(frequ$Freq/nrow(data.single),digits=2)
+frequ <- frequ[order(frequ$freqper,decreasing = TRUE),]
+frequ$data = str_wrap(frequ$data,width=15)
+View(frequ)
+data.singlefacet <- as.data.frame(data.single[,c(facetname)])
+names(data.singlefacet)[1] <- facetname
+data.singlefacet$data <- data.single[,i]
+frequ <- as.data.frame(table(data.singlefacet))
+frequ$freqper <- round(frequ$Freq/nrow(data.single),digits=2)
+frequ <- frequ[order(frequ$freqper,decreasing = TRUE),]
+frequ$data = str_wrap(frequ$data,width=15)
+count_replied <- paste(round(sum(!is.na(data.single[,i ]))/nrow(data.single)*100,digits=2 ),"%")
+wrapper <- function(x, ...)
+{
+paste(strwrap(x, ...), collapse = "\n")
+}
+## and now the graph
+theme_set(theme_gray(base_size = 20))
+ggplot(frequ, aes(x=data, y=freqper)) +
+geom_bar(fill="#2a87c8",colour="#2a87c8", stat="identity") +
+geom_text(aes(label=paste(round(freqper*100),"%",sep=""), hjust = 1))+
+guides(fill=FALSE) +
+ylab("Frequency") +
+scale_y_continuous(labels=percent)+
+xlab("") +
+facet_wrap(as.formula(paste("~", facetname)), ncol=2) +
+coord_flip() +
+# coord_fixed() + ##used to maintain the adspect ratio of the plot when it needs to be saved
+ggtitle(wrapper(title,width=65), subtitle = wrapper(paste("Disaggratated by question: ",facetlabel,"\n Response rate to this question:",count_replied,sep=""),width=65))+
+theme(plot.title=element_text(face="bold", size=20),
+plot.background = element_rect(fill = "transparent",colour = NA))
+# Saving graphs
+ggsave(filename=paste("out/disagg_one/bar_one_",variablename,"_disagg_",facetname,".png",sep=""), width=10, height=10,units="in", dpi=300)
+cat(paste0("Generated bar chart for question: ",i, " ", title ," - with disaggregation on - ",j, " ",facetlabel, "  saved as image:   ", variablename,"_disagg_",facetname,"\n"))
+ggplot(frequ, aes(x=data, y=freqper)) +
+geom_bar(fill="#2a87c8",colour="#2a87c8", stat="identity") +
+geom_text(aes(label=paste(round(freqper*100),"%",sep=""), hjust = 1, size=20))+
+guides(fill=FALSE) +
+ylab("Frequency") +
+scale_y_continuous(labels=percent)+
+xlab("") +
+facet_wrap(as.formula(paste("~", facetname)), ncol=2) +
+coord_flip() +
+# coord_fixed() + ##used to maintain the adspect ratio of the plot when it needs to be saved
+ggtitle(wrapper(title,width=65), subtitle = wrapper(paste("Disaggratated by question: ",facetlabel,"\n Response rate to this question:",count_replied,sep=""),width=65))+
+theme(plot.title=element_text(face="bold", size=20),
+plot.background = element_rect(fill = "transparent",colour = NA))
+# Saving graphs
+ggsave(filename=paste("out/disagg_one/bar_one_",variablename,"_disagg_",facetname,".png",sep=""), width=10, height=10,units="in", dpi=300)
+cat(paste0("Generated bar chart for question: ",i, " ", title ," - with disaggregation on - ",j, " ",facetlabel, "  saved as image:   ", variablename,"_disagg_",facetname,"\n"))
+source("code/0-config.R")
+data <- read.csv(path.to.data,sep = ";")
+dico <- read.csv(path.to.dico,sep = ",")
+### List of select_one questions
+listoned <- dico[dico$type=="select_one_d" , c("listname","label","name","fullname")]
+listoned$qname <- ""
+for (i in 1:nrow(listoned)) {
+listoned[i,5] <- substr(as.character(listoned[i,4]), 1 , nchar(as.character(listoned[i,4])) -1 - nchar(as.character(listoned[i,3])))
+}
+check <- as.data.frame(names(data))
+names(check)[1] <- "fullname"
+check$id <- row.names(check)
+listoned2 <- join(x=listoned, y=check, by="fullname",  type="left")
+listoned <- listoned2[!is.na(listoned2$id), ]
+## List of sub select_one
+liston <- dico[dico$type=="select_one" & is.na(dico$qrepeat), c("listname","label","name","fullname")]
+# liston2 <- join(x=liston, y=check, by="fullname",  type="left")
+# liston3 <- liston2[!is.na(liston$id), ]
+names(liston)[4] <- "qname"
+# test <- join(y=liston, x=listoned, type="left", by="qname")
+for (i in 1:nrow(liston) ) {
+# i <- 1
+newlistone <- as.character(liston[i,4])
+### select variable for a specific multiple questions
+selectlistoned <- as.data.frame(listoned[listoned$qname==newlistone , c("fullname")])
+names(selectlistoned)[1] <- "vartoconact"
+selectlistoned$vartoconact <- as.character(selectlistoned$vartoconact)
+#data <- data[ , c(1:745)]
+data$newvar <- ""
+for (j in 1:nrow(selectlistoned) ) {
+#j <- 7
+if (!is.na(selectlistoned[j , 1]) ) {
+data[ ,selectlistoned[j,1] ][is.na(data[ ,selectlistoned[j,1] ])] <- ""
+data$newvar <- paste0(data$newvar, data[ ,selectlistoned[j,1] ] )
+cat(paste("i=",i,"  -  j=",j,"\n"))
+} else{ }
+}
+#View(data$newvar)
+names(data)[names(data)=="newvar"] <- newlistone
+}
+#rm(liston,listoned,selectlistoned,i,newlistone)
+return(data)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
+library(KoboAnalyser)
