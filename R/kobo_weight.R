@@ -3,7 +3,7 @@
 #' @title  Weight the data
 
 #' @description  Automatically weight the data according to the information of 0-config.R
-#' @param mainDir
+#' @param mainDir Path to the project's working directory: mainly for shiny app
 #' @author Elliott Messeiller
 #'
 #' @examples

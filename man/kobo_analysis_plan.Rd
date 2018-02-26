@@ -6,6 +6,9 @@
 \usage{
 kobo_analysis_plan(mainDir = "")
 }
+\arguments{
+\item{mainDir}{Path to the project's working directory: mainly for shiny app}
+}
 \value{
 A file with all elements to get your data & form.
 }

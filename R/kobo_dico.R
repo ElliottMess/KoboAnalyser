@@ -54,12 +54,6 @@ kobo_dico <- function(mainDir='') {
   {cat("No column `correlate` in your survey worksheet. Creating a dummy one for the moment...\n");
     survey$correlate <- ""}
 
-  if("weight" %in% colnames(survey))
-  {
-    cat("Good: You have a column `weight` in your survey worksheet. This will be used to breakdown the generated report\n");
-  } else
-  {cat("No column `weight` in your survey worksheet. Creating a dummy one for the moment ...\n");
-    survey$weight <- ""}
 
   if("ordinal" %in% colnames(survey))
   {
@@ -70,7 +64,7 @@ kobo_dico <- function(mainDir='') {
 
 
   ## Avoid columns without names
-  survey <- survey[ ,c("type","name","label", "disaggregation", "weight","correlate","ordinal")]
+  survey <- survey[ ,c("type","name","label", "disaggregation","correlate","ordinal")]
 
   ## need to delete empty rows from the form
   survey <- as.data.frame(survey[!is.na(survey$type), ])
@@ -245,14 +239,14 @@ kobo_dico <- function(mainDir='') {
   #############################################################################################################
   #### Now Row bing questions & choices
 
-  choices2 <- choices[ ,c("type", "name", "namefull", "labelfull", "disaggregation","correlate", "listname", "qlevel", "qgroup", "labelchoice","ordinal","weight")]
+  choices2 <- choices[ ,c("type", "name", "namefull", "labelfull", "disaggregation","correlate", "listname", "qlevel", "qgroup", "labelchoice","ordinal")]
 
 
   names(choices2)[names(choices2)=="namefull"] <- "fullname"
   names(choices2)[names(choices2)=="labelfull"] <- "label"
 
 
-  survey2 <-    survey[,c("type", "name",  "fullname", "label", "disaggregation","correlate","listname","qlevel", "qgroup", "labelchoice","ordinal","weight")]
+  survey2 <-    survey[,c("type", "name",  "fullname", "label", "disaggregation","correlate","listname","qlevel", "qgroup", "labelchoice","ordinal")]
 
   survey2$formpart <- "questions"
   choices2$formpart <- "answers"

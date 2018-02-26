@@ -5,7 +5,7 @@
 #' @description  Automatically generate bar chart for each of the select_one question in the dataset. ggplot2 is used.
 #'
 #'
-#' @param mainDir Path to the project's working directory
+#' @param mainDir Path to the project's working directory: mainly for shiny app
 #'
 #'
 #' @author Edouard Legoupil, Elliott Messeiller
@@ -29,16 +29,16 @@ kobo_bar_one <- function(mainDir='') {
   source(paste0(mainDir,"/code/0-config.R"), local=TRUE)
   data <- read_excel(path.to.data, sheet=sheet)
 
-  mainDir <- "out"
+  mainDirectory <- "out"
   subDir <- "bar_one"
-  if (file.exists(paste(mainDir, subDir, "/", sep = "/", collapse = "/"))) {
+  if (file.exists(paste(mainDirectory, subDir, "/", sep = "/", collapse = "/"))) {
     cat("bar_one directory exists in out directory and is a directory.\n")
-  } else if (file.exists(paste(mainDir, subDir, sep = "/", collapse = "/"))) {
+  } else if (file.exists(paste(mainDirectory, subDir, sep = "/", collapse = "/"))) {
     cat("bar_one directory exists in your out directory.\n")
     # you will probably want to handle this separately
   } else {
     cat("bar_one directory does not exist in your out directory - creating now!\n ")
-    dir.create(file.path(mainDir, subDir))
+    dir.create(file.path(mainDirectory, subDir))
   }
 
 

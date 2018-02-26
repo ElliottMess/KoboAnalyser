@@ -6,6 +6,9 @@
 \usage{
 kobo_weight(mainDir = "")
 }
+\arguments{
+\item{mainDir}{Path to the project's working directory: mainly for shiny app}
+}
 \description{
 Automatically weight the data according to the information of 0-config.R
 }
