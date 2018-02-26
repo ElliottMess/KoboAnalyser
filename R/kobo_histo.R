@@ -4,8 +4,7 @@
 #'
 #' @description  Automatically generate histogrammes for each of the integer questions in the dataset. ggplot2 is used.
 #'
-#' @param data kobodatset to use
-#' @param dico ( generated from kobo_dico)
+#' @param mainDir Path to the project's working directory: mainly for proper shiny app path
 #'
 #' @author Edouard Legoupil
 #'
@@ -21,25 +20,29 @@
 #'
 #'
 
-kobo_histo <- function() {
-  source("code/0-config.R")
-  dico <- read.csv(path.to.dico,sep = ",")
+kobo_histo <- function(mainDir='') {
+  if (mainDir==''){
+    mainDir <- getwd()
+  }
+
+  source(paste0(mainDir,"/code/0-config.R"), local=TRUE)
+  data <- read_excel(path.to.data, sheet=sheet)
 
 
-  mainDir <- "out"
-  subDir <- "histo"
-  if (file.exists(paste(mainDir, subDir, "/", sep = "/", collapse = "/"))) {
+  mainDirectory <- paste0(mainDir,"/out")
+  subDir <- "/histo"
+  if (file.exists(paste(mainDirectory, subDir, "/", sep = "/", collapse = "/"))) {
     cat("histo directory exists in out directory and is a directory.\n")
-  } else if (file.exists(paste(mainDir, subDir, sep = "/", collapse = "/"))) {
+  } else if (file.exists(paste(mainDirectory, subDir, sep = "/", collapse = "/"))) {
     cat("histo directory exists in your out directory.\n")
     # you will probably want to handle this separately
   } else {
     cat("histo directory does not exist in your out directory - creating now!\n ")
-    dir.create(file.path(mainDir, subDir))
+    dir.create(file.path(mainDirectory, subDir))
   }
 
 
-  selectdf <- dico[dico$type=="integer", c("fullname","listname","label","name","qrepeat","type")]
+  selectdf <- dico[dico$type=="integer" | dico$type=="decimal" | dico$type=="calculate" &dico$name!=c("__version__","_version_"), c("fullname","listname","label","name","type")]
 
 
   ### Verify that those variable are actually in the original dataframe
@@ -67,40 +70,6 @@ kobo_histo <- function() {
   {
     paste(strwrap(x, ...), collapse = "\n")
   }
-
-
-        for (i in 1:nrow(selectdf) ) {
-        #  for (i in 1:2 ) {
-          # i <- 10
-          variablename <- names(data.integer)[i]
-          title <- attributes(data.integer)$variable.labels[i]
-
-          totalanswer <- nrow(data.integer)
-
-          count_replied <- (sum(!is.na(data.integer[,i ])))
-
-          percentresponse <- paste(round((count_replied/totalanswer*100),digits=2),"%",sep="")
-
-
-          ## Ensure that the variable is recognised as integer
-          data.integer[ , i] <- as.integer(data.integer[ , i])
-          #  regular histogram
-          theme_set(theme_gray(base_size = 18))
-
-          plot <- ggplot(data=data.integer, aes(data.integer[ , i])) +
-            geom_histogram(fill="#2a87c8", binwidth = 5) +
-            ggtitle(wrapper(title,width=75),
-                    subtitle = wrapper(paste0("Response rate to this question is ",percentresponse," of the total."),width=75))+
-            labs(x="", y="Count")+
-            #scale_x_discrete() +
-            scale_x_continuous(breaks= pretty_breaks()) +
-            theme(plot.title=element_text(face="bold", size=20),
-                  plot.background = element_rect(fill = "transparent",colour = NA))
-          cat(paste0(i, " - Generated histogramme for question: ", title , "\n"))
-          ggsave(plot, filename=paste("out/histo/histo_",variablename,".png",sep=""), width=10, height=10,units="in", dpi=300)
-
-          }
-
         for (i in 1:nrow(selectdf) ) {
          # for (i in 1:2 ) {
             # i <- 67
@@ -108,7 +77,7 @@ kobo_histo <- function() {
             title <- attributes(data.integer)$variable.labels[i]
 
             ## Ensure that the variable is recognised as integer
-            data.integer[ , i] <- as.integer(data.integer[ , i])
+            select.data.integer <- data.frame(as.numeric(na.omit(data.integer[ ,i])))
             #str(data.integer[ , i])
 
             totalanswer <- nrow(data.integer)
@@ -121,15 +90,16 @@ kobo_histo <- function() {
 
 
             # trendline on histogram by adding geom_density
-            ggplot(data=data.integer, aes(data.integer[ , i])) +
-              geom_histogram(aes(y =..density..), fill="#2a87c8", alpha = .6, binwidth = 5) +
-              geom_density(col=2) +
+            ggplot(data=select.data.integer, aes(select.data.integer)) +
+              geom_histogram(aes(y =..density..), fill="#2a87c8", alpha = .6, binwidth=0.5) +
+              geom_density(adjust=2) +
+              scale_x_continuous(expand = c(0,0)) +
               ggtitle(wrapper(title,width=65),
                       subtitle = wrapper(paste0("Response rate to this question is ",percentresponse," of the total."),width=65))+
               labs(x="", y="Frequency")+
               theme(plot.title=element_text(face="bold", size=20),
                     plot.background = element_rect(fill = "transparent",colour = NA))
-            ggsave(filename=paste("out/histo/histodensity_",variablename,".png",sep=""), width=10, height=10,units="in", dpi=300)
+            ggsave(filename=paste(mainDir,"/out/histo/",variablename,"_histo.png",sep=""), width=10, height=10,units="in", dpi=300)
 
             cat(paste0(i, "- Generated density graphs for question: ", title , "\n"))
           }
@@ -137,7 +107,7 @@ kobo_histo <- function() {
   cat(" \n")
   cat(" \n")
   cat(" ###########################################################\n")
-  cat(" # The histograms for integer questions were generated!    #\n")
+  cat(" # The histograms for number questions were generated!     #\n")
   cat(" # You can find them in the folder 'out/bar_one'!          #\n")
   cat(" ###########################################################\n")
 

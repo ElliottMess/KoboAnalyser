@@ -163,7 +163,10 @@ ui <-
             actionButton("bar_multi", "Generate graphs"),
 
             h4("Bar graphs for select_multiple questions with disaggregation"),
-            actionButton("bar_multi_facet", "Generate graphs")
+            actionButton("bar_multi_facet", "Generate graphs"),
+
+            h4("Histograms for integer,decimal, and calculate questions with disaggregation"),
+            actionButton("histo", "Generate graphs")
 
           ),
 
@@ -293,6 +296,12 @@ server <- function(input, output,session) {
     isolate({source(paste0(mainDir,"/code/0-config.R"), local=TRUE)})
 
     kobo_bar_multi(mainDir)
+  })
+
+  observeEvent(input$histo,{
+    isolate({source(paste0(mainDir,"/code/0-config.R"), local=TRUE)})
+
+    kobo_histo(mainDir)
   })
 
 
