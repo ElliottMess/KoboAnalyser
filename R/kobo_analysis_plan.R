@@ -21,20 +21,25 @@ kobo_analysis_plan <- function(mainDir = '') {
     mainDir <- getwd()
   }
   source(paste0(mainDir, "/code/0-config.R"), local = TRUE)
+  data <- read_excel(path.to.data, sheet=sheet)
+
 
   if (analysis_plan == "y") {
     # Getting the analysis plan
     selectdf <-read_excel(paste0(mainDir, "/data/", form) , sheet = 'analysis_plan')
     selectdf <- data.frame(selectdf, stringsAsFactors = FALSE)
 
+    calculation <- data.frame(selectdf["calculation"])
+
     # Creating columns to match dico format
-    selectdf$type <- "calculate"
+    selectdf$type <- "decimal"
     selectdf$listname <- NA
     selectdf$qlevel <- NA
     selectdf$ordinal <- NA
     selectdf$formpart <- "questions"
     selectdf$fullname <- ""
     selectdf$labelchoice <- ""
+    selectdf$weight <- NA
 
 
 
@@ -45,7 +50,8 @@ kobo_analysis_plan <- function(mainDir = '') {
     names(selectdf)[names(selectdf) == "disaggregation"] <- "disaggregation"
     names(selectdf)[names(selectdf) == "Ordinal"] <- "ordinal"
     names(selectdf)[names(selectdf) == "correlate"] <- "correlate"
-    names(selectdf)[names(selectdf) == "calculation"] <- "calculation"
+    names(selectdf)[names(selectdf) == "weight"] <- "weight"
+
 
     #Columns in the same order
     selectdf <-
@@ -61,8 +67,8 @@ kobo_analysis_plan <- function(mainDir = '') {
         "qgroup",
         "labelchoice",
         "ordinal",
-        "calculation",
-        "formpart"
+        "formpart",
+        "weight"
       )]
 
 
@@ -73,7 +79,7 @@ kobo_analysis_plan <- function(mainDir = '') {
       selectdf[i, "fullname"] <- var_name
 
       # Getting calculation
-      calc <- as.character(selectdf[i, "calculation"])
+      calc <- as.character(calculation[i, "calculation"])
       #splitting variables and operators
       calc_split <-data.frame(strsplit(calc, ",")[[1]], stringsAsFactors = FALSE)
       operators <- c("+", "-", "/", "*", "(", ")")
@@ -83,7 +89,7 @@ kobo_analysis_plan <- function(mainDir = '') {
         split_temp <- as.character(trim(calc_split[j, ]))
 
         if (split_temp %in% operators) {
-          calc_split[j, ] <- calc_split[j, ]
+          calc_split[j, ] <- trim(calc_split[j, ])
 
         } else{
           calc_split[j, ] <- as.character(dico[dico$name == split_temp, c("fullname"), ])
@@ -93,7 +99,7 @@ kobo_analysis_plan <- function(mainDir = '') {
       dico <- rbind(dico, selectdf)
 
       # Calculating values
-      ### data frame tg keep all the results
+      ### data frame to keep all the results
       res_tab <-data.frame(c(1:nrow(calc_split)), stringsAsFactors = FALSE)
 
       #Going through all observations
@@ -138,7 +144,7 @@ kobo_analysis_plan <- function(mainDir = '') {
     wb <- loadWorkbook(path.to.data)
     sheets <- getSheets(wb)
     removeSheet(wb, sheetName = "cleaned_data")
-    new_sheet <- createSheet(wb, sheetName = "cleaned_data")
+    new_sheet <- createSheet(wb, sheetName = as.character("cleaned_data"))
     addDataFrame(data, new_sheet, row.names = FALSE)
     saveWorkbook(wb, path.to.data)
   }

@@ -5,8 +5,7 @@
 #' @description  Automatically generate faceted chart for select one variable.. ggplot2 is used.
 #'
 #'
-#' @param data kobodatset to use
-#' @param dico ( generated from kobo_dico)
+#' @param mainDir Path to the project's working directory: mainly for proper shiny app path
 #'
 #'
 #'
@@ -24,19 +23,25 @@
 #'
 #'
 
-kobo_bar_one_facet <- function() {
-  source("code/0-config.R")
+kobo_bar_one_facet <- function(mainDir='') {
+  if (mainDir==''){
+    mainDir <- getwd()
+  }
 
-  mainDir <- "out"
-  subDir <- "disagg_one"
-  if (file.exists(paste(mainDir, subDir, "/", sep = "/", collapse = "/"))) {
+  source(paste0(mainDir,"/code/0-config.R"), local=TRUE)
+  data <- read_excel(path.to.data, sheet=sheet)
+
+
+  mainDirectory <- paste0(mainDir,"/out")
+  subDir <- "/disagg_one"
+  if (file.exists(paste(mainDirectory, subDir, "/", sep = "/", collapse = "/"))) {
     cat("disagg_one directory exists in out directory and is a directory.\n")
-  } else if (file.exists(paste(mainDir, subDir, sep = "/", collapse = "/"))) {
+  } else if (file.exists(paste(mainDirectory, subDir, sep = "/", collapse = "/"))) {
     cat("disagg_one directory exists in your out directory.\n")
     # you will probably want to handle this separately
   } else {
     cat("disagg_one directory does not exist in your out directory - creating now!\n ")
-    dir.create(file.path(mainDir, subDir))
+    dir.create(file.path(mainDirectory, subDir))
   }
 
 
@@ -150,14 +155,27 @@ kobo_bar_one_facet <- function() {
 
                           data.singlefacet[,1] <- data.frame(facetchoices[,2][match(data.singlefacet[,1],facetchoices[,1])], stringsAsFactors = FALSE)
 
-                          frequ <- data.frame(svytable(~data.singlefacet[["data"]]+data.singlefacet[[facetname]], surveydesign))
+                          if (usedweight=="sampling_frame"){
+                            frequ <- data.frame(svytable(~data.singlefacet[["data"]]+data.singlefacet[[facetname]], surveydesign))
+                            names(frequ)[1] <- "data"
+                            names(frequ)[2] <- "facet"
+
+
+                          }
+                          else {
+                            frequ <- data.frame(table(data.singlefacet))
+                            names(frequ)[1] <- "facet"
+                            names(frequ)[2] <- "data"
+
+
+                          }
+
                           frequ$freqper <- frequ$Freq/count_replied
-                          names(frequ)[1] <- "data"
-                          names(frequ)[2] <- "facet"
                           frequ$data = str_wrap(frequ$data,width=15)
                           frequ <- frequ[frequ$facet!=facetlabel,c("data","facet", "Freq","freqper")]
 
-                          count_replied <- paste(round(sum(!is.na(data.single[,i ]))/nrow(data.single)*100,digits=2 ),"%")
+
+                          percentresponse <- paste(round(sum(!is.na(data.single[,i ]))/nrow(data.single)*100,digits=2 ),"%")
 
                           ordinal <- as.character(dico[dico$fullname==variablename,c("ordinal")])
 
@@ -173,7 +191,7 @@ kobo_bar_one_facet <- function() {
                           names(background_rect) <- c("data")
                           background_rect$freqper <-1
 
-                          theme_set(theme_gray(base_size = s20))
+                          theme_set(theme_gray(base_size = 20))
 
 
                            ggplot(frequ,aes(x=data, y=freqper)) +
@@ -190,7 +208,7 @@ kobo_bar_one_facet <- function() {
                                   plot.subtitle=element_text(face="italic", size=22)
                             )
                           # Saving graphs
-                          ggsave(filename=paste("out/disagg_one/",variablename,"_disagg_",facetname,"bar_one.png",sep=""), width=10, height=10,units="in", dpi=300)
+                          ggsave(filename=paste(mainDir,"/out/disagg_one/",variablename,"_disagg_",facetname,"bar_one.png",sep=""), width=10, height=10,units="in", dpi=300)
                           cat(paste0("Generated bar chart for question: ",i, " ", title ," - with disaggregation on - ",j, " ",facetlabel, "  saved as image:   ", variablename,"_disagg_",facetname,"\n"))
                         }
                         ### End testing

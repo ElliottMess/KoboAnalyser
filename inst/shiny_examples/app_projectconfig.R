@@ -98,8 +98,7 @@ ui <-
         column(5,
           radioButtons("weighting_sys", h4("What kind of weighting system did you use?"),
                        choices = c("None"="none",
-                                   "Sampling Frame"="sampling_frame",
-                                   "Custom"="custom"))
+                                   "Sampling Frame"="sampling_frame"))
         ),
         column(4,
           conditionalPanel(condition='input.weighting_sys=="sampling_frame"',
@@ -154,6 +153,17 @@ ui <-
         titlePanel("Output"),
         sidebarLayout(position="left",
           mainPanel(
+            h4("Bar graphs for select_one questions"),
+            actionButton("bar_one", "Generate graphs"),
+
+            h4("Bar graphs for select_one questions with disaggregation"),
+            actionButton("bar_one_facet", "Generate graphs"),
+
+            h4("Bar graphs for select_multiple questions"),
+            actionButton("bar_multi", "Generate graphs"),
+
+            h4("Bar graphs for select_multiple questions with disaggregation"),
+            actionButton("bar_multi_facet", "Generate graphs")
 
           ),
 
@@ -260,6 +270,31 @@ server <- function(input, output,session) {
     data_sheets <- excel_sheets(inFile$datapath)
     radioButtons("data_sheet","Select the sheet with your data",data_sheets)
   })
+
+  observeEvent(input$bar_one,{
+    isolate({source(paste0(mainDir,"/code/0-config.R"), local=TRUE)})
+
+    kobo_bar_one(mainDir)
+  })
+
+  observeEvent(input$bar_one_facet,{
+    isolate({source(paste0(mainDir,"/code/0-config.R"), local=TRUE)})
+
+    kobo_bar_one_facet(mainDir)
+  })
+
+  observeEvent(input$bar_multi_facet,{
+    isolate({source(paste0(mainDir,"/code/0-config.R"), local=TRUE)})
+
+    kobo_bar_multi_facet(mainDir)
+  })
+
+  observeEvent(input$bar_multi,{
+    isolate({source(paste0(mainDir,"/code/0-config.R"), local=TRUE)})
+
+    kobo_bar_multi(mainDir)
+  })
+
 
 
   output$report <- downloadHandler(

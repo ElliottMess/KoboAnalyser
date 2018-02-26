@@ -5,8 +5,7 @@
 #' @description  Automatically generate faceted chart for select multiple variables. ggplot2 is used.
 #'
 #'
-#' @param data kobodatset to use
-#' @param dico ( generated from kobo_dico)
+#' @param mainDir Path to the project's working directory: mainly for proper shiny app path
 #'
 #'
 #'
@@ -24,21 +23,26 @@
 #'
 #'
 
-kobo_bar_multi_facet <- function() {
+kobo_bar_multi_facet <- function(mainDir='') {
   # Making your life easier by finding the dico and data from 0-config.R (created during kobo_project_config())
-  source("code/0-config.R")
+  if (mainDir==''){
+    mainDir <- getwd()
+  }
 
-  # Creating folder the graphs
-  mainDir <- "out"
-  subDir <- "disagg_multi"
-  if (file.exists(paste(mainDir, subDir, "/", sep = "/", collapse = "/"))) {
+  source(paste0(mainDir,"/code/0-config.R"), local=TRUE)
+  data <- read_excel(path.to.data, sheet=sheet)
+
+
+  mainDirectory <- paste0(mainDir,"/out")
+  subDir <- "/disagg_multi"
+  if (file.exists(paste(mainDirectory, subDir, "/", sep = "/", collapse = "/"))) {
     cat("disagg_multi directory exists in out directory and is a directory.\n")
-  } else if (file.exists(paste(mainDir, subDir, sep = "/", collapse = "/"))) {
+  } else if (file.exists(paste(mainDirectory, subDir, sep = "/", collapse = "/"))) {
     cat("disagg_multi directory exists in your out directory.\n")
     # you will probably want to handle this separately
   } else {
     cat("disagg_multi directory does not exist in your out directory - creating now!\n ")
-    dir.create(file.path(mainDir, subDir))
+    dir.create(file.path(mainDirectory, subDir))
   }
 
   # List of select_multiple questions and choices
@@ -96,11 +100,12 @@ kobo_bar_multi_facet <- function() {
         listloop <- as.character(listmulti[i,1])
         listlabel <-  as.character(listmulti[i,2])
 
+
         ### select variable for a specific multiple questions
-        selectmultilist <- as.character(dico[dico$type=="select_multiple" & dico$listname==listloop , c("fullname")])
+        selectmultilist <- as.character(dico[dico$type=="select_multiple" & dico$listname==listloop & dico$label==listlabel, c("fullname")])
 
         ## Check that those variable are in the dataset
-        selectdf <- dico[dico$type=="select_multiple" & dico$listname==listloop , c("fullname","listname","label","name","disaggregation","labelchoice")]
+        selectdf <- dico[dico$type=="select_multiple" & dico$listname==listloop & dico$qlevel==variablename , c("fullname","listname","label","name","disaggregation","labelchoice")]
         selectdf2 <- join(x=selectdf, y=check, by="fullname",  type="left")
         selectdf2 <- selectdf2[!is.na(selectdf2$id), ]
 
@@ -146,8 +151,12 @@ kobo_bar_multi_facet <- function() {
                 # Put ID to each row
 
                 data.selectmultilist$id <- rownames(data.selectmultilist)
-                data.selectmultilist$weight <- data$weight
-                names(data.selectmultilist$weight) <- "weight"
+
+                if(usedweight=="sampling_frame"){
+                  data.selectmultilist$weight <- data$weight
+                  names(data.selectmultilist$weight) <- "weight"
+                }
+
                 data.selectmultilist[facetname] <- data[facetname]
                 names(data.selectmultilist)[length(names(data.selectmultilist))] <- "facet"
 
@@ -160,12 +169,23 @@ kobo_bar_multi_facet <- function() {
 
                 percentresponse <- paste(round((count_replied/totalanswer)*100,digits=2),"%",sep="")
 
-                meltdata <- melt(data.selectmultilist,id=c("weight","id","facet"))
+                if(usedweight=="sampling_frame"){
 
-                castdata <- as.data.frame(table(meltdata[,c("value","variable","facet","weight")]))
-                castdata$Freq <- as.numeric(as.character(castdata$Freq))
-                castdata$weight <- as.numeric(as.character(castdata$weight))
-                castdata$freqper <- round((castdata$Freq*castdata$weight)/count_replied,digits=2)
+                  meltdata <- melt(data.selectmultilist,id=c("weight","id","facet"))
+
+                  castdata <- as.data.frame(table(meltdata[,c("value","variable","facet","weight")]))
+                  castdata$Freq <- as.numeric(as.character(castdata$Freq))
+                  castdata$weight <- as.numeric(as.character(castdata$weight))
+                  castdata$freqper <- round((castdata$Freq*castdata$weight)/count_replied,digits=2)
+                }
+
+                else{
+                  meltdata <- melt(data.selectmultilist,id=c("id","facet"))
+
+                  castdata <- as.data.frame(table(meltdata[,c("value","variable","facet")]))
+                  castdata$Freq <- as.numeric(as.character(castdata$Freq))
+                  castdata$freqper <- round((castdata$Freq)/count_replied,digits=2)
+                }
 
                 castdata <- castdata[castdata$value!=0, ]
 
@@ -200,7 +220,7 @@ kobo_bar_multi_facet <- function() {
                           plot.subtitle=element_text(face="italic", size=22)
                     )
 
-                  ggsave(filename=paste("out/disagg_multi/",variablename,"_bar_multi_disagg_",facetname,".png",sep=""), width=12, height=10,units="in", dpi=300)
+                  ggsave(filename=paste(mainDir, "/out/disagg_multi/",variablename,"_bar_multi_disagg_",facetname,".png",sep=""), width=12, height=10,units="in", dpi=300)
 
                 cat(paste0("Generated bar chart for question: ", listlabel , "\n"))
               }

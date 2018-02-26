@@ -62,6 +62,14 @@ kobo_dico <- function(mainDir='') {
   {cat("No column `ordinal` in your survey worksheet. Creating a dummy one for the moment ...\n");
     survey$ordinal <- ""}
 
+  if("weight" %in% colnames(survey))
+  {
+    cat("Good: You have a column `weight` in your survey worksheet. \n");
+  } else
+  {cat("No column `weight` in your survey worksheet. Creating a dummy one for the moment ...\n");
+    survey$weight <- ""}
+
+
 
   ## Avoid columns without names
   survey <- survey[ ,c("type","name","label", "disaggregation","correlate","ordinal")]
@@ -203,6 +211,8 @@ kobo_dico <- function(mainDir='') {
 
   ## a few colummns to adjust to match questions & choices
   survey$labelchoice <- survey$label
+  survey$weight <- NA
+
 
   #############################################################################################################
   #### Now looking at choices --
@@ -235,18 +245,20 @@ kobo_dico <- function(mainDir='') {
   choices$namefull <- paste0(choices$fullname, sep = ".", choices$name)
   choices$correlate <-""
   choices$ordinal <-""
+  choices$qlevel <- choices$fullname
+  choices$weight <- NA
 
   #############################################################################################################
   #### Now Row bing questions & choices
 
-  choices2 <- choices[ ,c("type", "name", "namefull", "labelfull", "disaggregation","correlate", "listname", "qlevel", "qgroup", "labelchoice","ordinal")]
+  choices2 <- choices[ ,c("type", "name", "namefull", "labelfull", "disaggregation","correlate", "listname", "qlevel", "qgroup", "labelchoice","ordinal", "weight")]
 
 
   names(choices2)[names(choices2)=="namefull"] <- "fullname"
   names(choices2)[names(choices2)=="labelfull"] <- "label"
 
 
-  survey2 <-    survey[,c("type", "name",  "fullname", "label", "disaggregation","correlate","listname","qlevel", "qgroup", "labelchoice","ordinal")]
+  survey2 <-    survey[,c("type", "name",  "fullname", "label", "disaggregation","correlate","listname","qlevel", "qgroup", "labelchoice","ordinal", "weight")]
 
   survey2$formpart <- "questions"
   choices2$formpart <- "answers"

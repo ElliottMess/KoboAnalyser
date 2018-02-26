@@ -5,8 +5,7 @@
 #' @description  Automatically generate bar chart for each of the select_multiple question in the dataset. ggplot2 is used.
 #'
 #'
-#' @param data kobodatset to use
-#' @param dico Generated from kobo_dico function
+#' @param mainDir Path to the project's working directory: mainly for proper shiny app path
 #'
 #'
 #' @author Edouard Legoupil, Elliott Messeiller
@@ -23,20 +22,25 @@
 #'
 #'
 
-kobo_bar_multi <- function() {
+kobo_bar_multi <- function(mainDir='') {
 
   # Making your life easier by finding the dico and data from 0-config.R (created during kobo_project_config())
-  source("code/0-config.R")
+  if (mainDir==''){
+    mainDir <- getwd()
+  }
 
-  # Creating folder the graphs
-  mainDir <- "out"
-  subDir <- "bar_multi"
-  if (file.exists(paste(mainDir, subDir, "/", sep = "/", collapse = "/"))) {
+  source(paste0(mainDir,"/code/0-config.R"), local=TRUE)
+  data <- read_excel(path.to.data, sheet=sheet)
+
+
+  mainDirectory <- paste0(mainDir,"/out")
+  subDir <- "/bar_multi"
+  if (file.exists(paste(mainDirectory, subDir, "/", sep = "/", collapse = "/"))) {
     cat("bar_multi directory exists in out directory and is a directory.\n")
-  } else if (file.exists(paste(mainDir, subDir, sep = "/", collapse = "/"))) {
+  } else if (file.exists(paste(mainDirectory, subDir, sep = "/", collapse = "/"))) {
     cat("bar_multi directory exists in your out directory.\n")
     # you will probably want to handle this separately
-  } else {  dir.create(file.path(mainDir, subDir))
+  } else {  dir.create(file.path(mainDirectory, subDir))
     cat("bar_multi directory does not exist in your out directory - creating now!\n ")
   }
 
@@ -60,10 +64,7 @@ kobo_bar_multi <- function() {
     data.selectmulti <- data [selectmulti ]
     data.selectmulti  <- kobo_label(data.selectmulti, dico)
 
-
-
-
-    listmulti <- dico[dico$type=="select_multiple_d", c("listname","label","name","fullname","disaggregation")]
+    listmulti <- dico[dico$type=="select_multiple_d", c("listname","label","name","fullname","disaggregation", "qlevel")]
     selectdf1 <- as.data.frame(unique(selectdf$listname))
     names(selectdf1)[1] <- "listname"
     listmulti <- join(x=listmulti, y=selectdf1, by="listname", type="left")
@@ -74,17 +75,18 @@ kobo_bar_multi <- function() {
     for (i in 1:nrow(listmulti) ) {
       listloop <- as.character(listmulti[i,1])
       listlabel <-  as.character(listmulti[i,2])
+      listfullname <- as.character(listmulti[i,"fullname"])
 
       ### select variable for a specific multiple questions
-      selectmultilist <- as.character(dico[dico$type=="select_multiple" & dico$listname==listloop , c("fullname")])
+
 
       ## Check that those variable are in the dataset
-      selectdf <- dico[dico$type=="select_multiple" & dico$listname==listloop , c("fullname","listname","label","name","disaggregation","labelchoice")]
+      selectdf <- dico[dico$type=="select_multiple" & dico$listname==listloop & dico$qlevel==listfullname , c("fullname","listname","label","name","disaggregation","labelchoice")]
       selectdf2 <- join(x=selectdf, y=check, by="fullname",  type="left")
       selectdf2 <- selectdf2[!is.na(selectdf2$id), ]
 
       listlabelchoice <- as.character(selectdf2[,"labelchoice"])
-      ordinal <- as.character(dico[dico$fullname==variablename,c("ordinal")])
+      ordinal <- as.character(dico[dico$type=="select_multiple_d" & dico$listname==listloop,c("ordinal")])
 
 
 
@@ -110,10 +112,8 @@ kobo_bar_multi <- function() {
 
         names(data.selectmultilist) <- listlabelchoice
 
-        data.selectmultilist$weight <- data$weight
 
 
-        # Put ID to each row
 
         #Count total answer (for the survey) and answered to this question
 
@@ -125,14 +125,26 @@ kobo_bar_multi <- function() {
 
         percentresponse <- paste(round((count_replied/totalanswer)*100,digits=2),"%",sep="")
 
+        if (usedweight=="sampling_frame"){
+          data.selectmultilist$weight <- data$weight
+          meltdata <- melt(data.selectmultilist,id="weight")
+          meltdata$value <- as.numeric(meltdata$value)
 
-        meltdata <- melt(data.selectmultilist,id="weight")
-        meltdata$value <- as.numeric(meltdata$value)
+          castdata <- as.data.frame(table(meltdata[,c("value","variable","weight")]))
+          castdata$Freq <- as.numeric(as.character(castdata$Freq))
+          castdata$weight <- as.numeric(as.character(castdata$weight))
+          castdata$freqper <- round((castdata$Freq*castdata$weight)/count_replied,digits=2)
+        }
+        else{
+          data.selectmultilist$id <- rownames(data.selectmultilist)
+          meltdata <- melt(data.selectmultilist,id="id")
+          meltdata$value <- as.numeric(meltdata$value)
 
-        castdata <- as.data.frame(table(meltdata[,c("value","variable","weight")]))
-        castdata$Freq <- as.numeric(as.character(castdata$Freq))
-        castdata$weight <- as.numeric(as.character(castdata$weight))
-        castdata$freqper <- round((castdata$Freq*castdata$weight)/count_replied,digits=2)
+          castdata <- as.data.frame(table(meltdata[,c("value","variable")]))
+          castdata$Freq <- as.numeric(as.character(castdata$Freq))
+          castdata$freqper <- round((castdata$Freq)/count_replied,digits=2)
+
+        }
         castdata <- castdata[castdata$Freq!=0, ]
         #castdata <- dcast(meltdata, value~variable, fun.aggregate = length)
 
@@ -157,11 +169,11 @@ kobo_bar_multi <- function() {
           xlab("") + ylab("")+
           scale_y_continuous(labels=percent, limits=c(0,1))+
           coord_flip()+
-          ggtitle(str_wrap(listlabel,width=60),
+          ggtitle(str_wrap(listlabel,width=50),
                   subtitle = str_wrap(paste0("Multiple choice question: Response rate to this question is ",percentresponse," of the total."),width=60))+
           theme(plot.title=element_text(face="bold", size=22),
                 plot.background = element_rect(fill = "transparent",colour = NA))
-        ggsave(filename=paste("out/bar_multi/bar_multi_",listloop,".png",sep=""), width=10, height=10,units="in", dpi=300)
+        ggsave(filename=paste(mainDir, "/out/bar_multi/bar_multi_",listloop,".png",sep=""), width=10, height=10,units="in", dpi=300)
 
         cat(paste0("Generated bar chart for question: ", listlabel , "\n"))
         }

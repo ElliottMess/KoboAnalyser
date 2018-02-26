@@ -29,7 +29,7 @@ kobo_bar_one <- function(mainDir='') {
   source(paste0(mainDir,"/code/0-config.R"), local=TRUE)
   data <- read_excel(path.to.data, sheet=sheet)
 
-  mainDirectory <- "out"
+  mainDirectory <- paste0(mainDir,"/out")
   subDir <- "bar_one"
   if (file.exists(paste(mainDirectory, subDir, "/", sep = "/", collapse = "/"))) {
     cat("bar_one directory exists in out directory and is a directory.\n")
@@ -145,7 +145,7 @@ kobo_bar_one <- function(mainDir='') {
 
         theme( plot.title=element_text(face="bold", size=20),
               plot.background = element_rect(fill = "transparent",colour = NA))
-      ggsave(filename=paste("out/bar_one/",variablename,"_bar_one.png",sep=""), width=10, height=10,units="in", dpi=300)
+      ggsave(filename=paste(mainDir,"/out/bar_one/",variablename,"_bar_one.png",sep=""), width=10, height=10,units="in", dpi=300)
 
       cat(paste0("Generated bar chart for question: ", title , "\n"))
 
