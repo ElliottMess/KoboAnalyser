@@ -208,7 +208,7 @@ kobo_projectinit <- function() {
     close(fileConn)
   }
 
-
+  source("code/0-packages.R") # Make sure that all the packages necessary are loaded.
 
 
 }
