@@ -33,18 +33,6 @@ kobo_bar_multi_facet <- function(mainDir='') {
   data <- read_excel(path.to.data, sheet=sheet)
 
 
-  mainDirectory <- paste0(mainDir,"/out")
-  subDir <- "/disagg_multi"
-  if (file.exists(paste(mainDirectory, subDir, "/", sep = "/", collapse = "/"))) {
-    cat("disagg_multi directory exists in out directory and is a directory.\n")
-  } else if (file.exists(paste(mainDirectory, subDir, sep = "/", collapse = "/"))) {
-    cat("disagg_multi directory exists in your out directory.\n")
-    # you will probably want to handle this separately
-  } else {
-    cat("disagg_multi directory does not exist in your out directory - creating now!\n ")
-    dir.create(file.path(mainDirectory, subDir))
-  }
-
   # List of select_multiple questions and choices
   selectdf <- dico[dico$type == "select_multiple", c("fullname","listname","label","name","disaggregation"), ]
 

@@ -84,42 +84,18 @@ kobo_projectinit <- function() {
     file.copy(paste(path_correct,"/KoboAnalyser/script/0-packages.R",sep=""), destfile)
   }
 
-  destfile=paste0(mainDir,"/code/0-theme.R")
-  if (!file.exists(destfile)) {
-    file.copy(paste(path_correct,"/KoboAnalyser/script//0-theme.R",sep=""), destfile)
-  }
-
   destfile=paste0(mainDir,"/code/0-config.R")
   if (!file.exists(destfile)) {
     file.copy(paste(path_correct,"/KoboAnalyser/script//0-config.R",sep=""), destfile)
   }
 
-  destfile=paste0(mainDir,"/code/1-loaddata.R")
-  if (!file.exists(destfile)) {
-    file.copy(paste(path_correct,"/KoboAnalyser/script//1-loaddata.R",sep=""), destfile)
-  }
-
-  destfile=paste0(mainDir,"/code/2-create-graph.R")
-  if (!file.exists(destfile)) {
-    file.copy(paste(path_correct,"/KoboAnalyser/script//2-create-graph.R",sep=""), destfile)
-  }
-
-  destfile=paste0(mainDir,"/code/3-create-indicators.R")
-  if (!file.exists(destfile)) {
-    file.copy(paste(path_correct,"/KoboAnalyser/script//3-create-indicators.R",sep=""), destfile)
-  }
-
-  destfile=paste0(mainDir,"/code/4-generate-report.R")
+  destfile=paste0(mainDir,"/code/1-generate-report.R")
   if (!file.exists(destfile)) {
     file.copy(paste(path_correct,"/KoboAnalyser/script//4-generate-report.R",sep=""), destfile)
   }
   destfile=paste0(mainDir,"/code/report.Rmd")
   if (!file.exists(destfile)) {
     file.copy(paste(path_correct,"/KoboAnalyser/script//report.Rmd",sep=""), destfile)
-  }
-  destfile=paste0(mainDir,"/code/3-create-indicators.R")
-  if (!file.exists(destfile)) {
-    file.copy(paste(path_correct,"/KoboAnalyser/script//3-create-indicators.R",sep=""), destfile)
   }
 
   subsubDir <- "shiny_app"
@@ -207,6 +183,55 @@ kobo_projectinit <- function() {
     writeLines(c("### This folder is where the analysis output will be generated"))
     close(fileConn)
   }
+
+  mainDirectory <- paste0(mainDir,"/out")
+  subDir <- "/bar_multi"
+  if (file.exists(paste(mainDirectory, subDir, "/", sep = "/", collapse = "/"))) {
+    cat("bar_multi directory exists in out directory and is a directory.\n")
+  } else if (file.exists(paste(mainDirectory, subDir, sep = "/", collapse = "/"))) {
+    cat("bar_multi directory exists in your out directory.\n")
+    # you will probably want to handle this separately
+  } else {  dir.create(file.path(mainDirectory, subDir))
+    cat("bar_multi directory does not exist in your out directory - creating now!\n ")
+  }
+
+  mainDirectory <- paste0(mainDir,"/out")
+  subDir <- "/disagg_multi"
+  if (file.exists(paste(mainDirectory, subDir, "/", sep = "/", collapse = "/"))) {
+    cat("disagg_multi directory exists in out directory and is a directory.\n")
+  } else if (file.exists(paste(mainDirectory, subDir, sep = "/", collapse = "/"))) {
+    cat("disagg_multi directory exists in your out directory.\n")
+    # you will probably want to handle this separately
+  } else {
+    cat("disagg_multi directory does not exist in your out directory - creating now!\n ")
+    dir.create(file.path(mainDirectory, subDir))
+  }
+
+  mainDirectory <- paste0(mainDir,"/out")
+  subDir <- "bar_one"
+  if (file.exists(paste(mainDirectory, subDir, "/", sep = "/", collapse = "/"))) {
+    cat("bar_one directory exists in out directory and is a directory.\n")
+  } else if (file.exists(paste(mainDirectory, subDir, sep = "/", collapse = "/"))) {
+    cat("bar_one directory exists in your out directory.\n")
+    # you will probably want to handle this separately
+  } else {
+    cat("bar_one directory does not exist in your out directory - creating now!\n ")
+    dir.create(file.path(mainDirectory, subDir))
+  }
+
+  mainDirectory <- paste0(mainDir,"/out")
+  subDir <- "/disagg_one"
+  if (file.exists(paste(mainDirectory, subDir, "/", sep = "/", collapse = "/"))) {
+    cat("disagg_one directory exists in out directory and is a directory.\n")
+  } else if (file.exists(paste(mainDirectory, subDir, sep = "/", collapse = "/"))) {
+    cat("disagg_one directory exists in your out directory.\n")
+    # you will probably want to handle this separately
+  } else {
+    cat("disagg_one directory does not exist in your out directory - creating now!\n ")
+    dir.create(file.path(mainDirectory, subDir))
+  }
+
+
 
   source("code/0-packages.R") # Make sure that all the packages necessary are loaded.
 

@@ -29,23 +29,8 @@ kobo_bar_one <- function(mainDir='') {
   source(paste0(mainDir,"/code/0-config.R"), local=TRUE)
   data <- read_excel(path.to.data, sheet=sheet)
 
-  mainDirectory <- paste0(mainDir,"/out")
-  subDir <- "bar_one"
-  if (file.exists(paste(mainDirectory, subDir, "/", sep = "/", collapse = "/"))) {
-    cat("bar_one directory exists in out directory and is a directory.\n")
-  } else if (file.exists(paste(mainDirectory, subDir, sep = "/", collapse = "/"))) {
-    cat("bar_one directory exists in your out directory.\n")
-    # you will probably want to handle this separately
-  } else {
-    cat("bar_one directory does not exist in your out directory - creating now!\n ")
-    dir.create(file.path(mainDirectory, subDir))
-  }
 
-
-  ## get list of all nominal variables
-
-
-  ## Check that those variable are in the dataset
+  ## Check that variable are in the dataset
   selectdf <- dico[dico$type=="select_one"  , c("fullname","listname","label","name","disaggregation","labelchoice")]
 
   check <- as.data.frame(names(data))

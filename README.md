@@ -65,6 +65,15 @@ Also make sure that you downloaded your data in the right format:
 * XML values and headers
 * Include groups in headers
 * 'Group seperator' as dot ('.')
+
+### Error when building the dictionnary or configuration file
+
+If you see this message:
+```
+Error in file(file, ifelse(append, "a", "w")) : 
+  cannot open the connection
+```
+It is most likely because you have the form, dictionnary or dataset open on your computer. If you close it and start over, the problem should be fixed.
   
 ### Error when loading packages
  If you get this error:
