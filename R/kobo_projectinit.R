@@ -134,7 +134,7 @@ kobo_projectinit <- function() {
   }
 
   destfile=paste0(mainDir,"/code/shiny_app/app_koboanalyser.R")
-    file.copy(paste(path_correct,"/KoboAnalyser/shiny_examples//app_koboanalyser.R",sep=""), destfile, overwrite = TRUE)
+    file.copy(paste(path_correct,"/KoboAnalyser/shiny_app//app_koboanalyser.R",sep=""), destfile, overwrite = TRUE)
 
 
   subsubsubDir <- "www"

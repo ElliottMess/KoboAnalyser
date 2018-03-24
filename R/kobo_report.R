@@ -2,9 +2,11 @@
 #' @rdname kobo_report
 #' @title  Generate the analysis
 
-#' @description  Automatically generate the report.
+#' @description  Automatically generate the report with
 #'
 #' @author Edouard Legoupil, Elliott Messeiller
+#' @param mainDir Path to the project's working directory: mainly for proper shiny app path
+
 #'
 #' @examples
 #' kobo_report()
@@ -17,13 +19,14 @@
 #'
 #'
 
-kobo_report <- function() {
-  source("code/0-config.R")
-  #### Generate Rmd files for each chapter ------
+kobo_report <- function(mainDir="") {
+  if (mainDir==''){
+    mainDir <- getwd()
+  }
 
-    ## Load the form
+  source(paste0(mainDir,"/code/0-config.R"), local=TRUE)
+  data <- read_excel(path.to.data, sheet=sheet)
 
-  mainDir <- getwd()
 
   ### Load the data
 

@@ -206,7 +206,7 @@ server <- function(input, output,session) {
     sink(configfile)
     cat("#### Config file ###\n")
     cat("\n")
-    cat("### Can be manualy edited or interactively rewritten using the function kobo_projectconfig() or kobo_shiny('app_projectconfig.R') \n")
+    cat("### Can be manualy edited or interactively rewritten using the function kobo_projectconfig() or kobo_shiny('app_koboanalyser.R') \n")
     cat("\n")
     cat("### 1. Form   ###\n")
     cat(paste("form<-'",inFile_form$name,"'",sep=""))

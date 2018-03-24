@@ -49,7 +49,7 @@ kobo_projectinit() # Creats folders necessary and transfer files needed
 It might take a while as a few other packages have to be installed or loaded. Once the see the " >" again at the beginning of the line, you can run:
 
 ```
-kobo_shiny("app_projectconfig.R")
+kobo_shiny("app_koboanalyser.R")
 ```
 
 This will launch a graphic interface with other instructions and options.
