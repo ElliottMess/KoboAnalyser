@@ -55,7 +55,19 @@ kobo_shiny("app_koboanalyser.R")
 This will launch a graphic interface with other instructions and options.
 
 ## Troubleshooting
-If you get this error:
+### The application crashed
+If the application (graphic interface) crashes, make sure that all packages necessary are loaded with:
+```
+source("code/0-packages.R")
+```
+Also make sure that you downloaded your data in the right format:
+* Export as XLS
+* XML values and headers
+* Include groups in headers
+* 'Group seperator' as dot ('.')
+  
+### Error when loading packages
+ If you get this error:
 ```
 Error: package or namespace load failed for 'rJava'
 ```
