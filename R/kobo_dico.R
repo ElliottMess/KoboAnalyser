@@ -281,20 +281,11 @@ kobo_dico <- function(mainDir='') {
  # f_csv(dico)
 #  return(dico)
 cat("\n")
-cat("\n")
-cat("\n")
 cat("###########################################################################\n")
 cat("# Your dictionnary was created, now the data and forms are linked.        #\n")
 cat("# You can found it in the data directory.                                 #\n")
-cat("#                                                                         #\n")
-cat("# To continue the analysis you can:                                       #\n")
-cat("#      1. Run kobo_bar_one() for graphs of select_one questions           #\n")
-cat("#      2. Run kobo_bar_multi() for graphs of select_multiple questions    #\n")
-cat("#      3. Run kobo_histo() for historgrams of integer questions           #\n")
-cat("#      4. Run kobo_correlation() for the correlations planned             #\n")
-cat("#                                                                         #\n")
-cat("#  If you are not sure what to do, run kobo_analysis()                    #\n")
 cat("###########################################################################\n")
+cat("\n")
 
 
 #Fetching the directory

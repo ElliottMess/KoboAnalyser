@@ -142,7 +142,6 @@ kobo_bar_multi_facet <- function(mainDir='') {
                 facetname1 <- as.character(single.facet[j,1])
                 facetname <- as.character(allvar[allvar$name==facetname1,c("fullname")])
 
-                ordinal <- as.character(dico[dico$fullname==facetname,c("ordinal")])
                 facetlabel <- as.character(dico[dico$fullname==facetname,c("label")])
                 facetchoices <- dico[dico$name==facetname1, c("name","labelchoice","listname")]
                 facetchoices <-dico[dico$listname==facetchoices[,3], c("name","labelchoice","listname")]
@@ -194,11 +193,6 @@ kobo_bar_multi_facet <- function(mainDir='') {
 
                 castdata$variable = str_wrap(castdata$variable,width=15)
 
-                if (is.na(ordinal)==T | ordinal==""){
-                  castdata<-castdata[with(castdata,order(freqper)),]
-                }
-
-
                 background_rect <- data.frame(unique(castdata[,c("variable")]))
                 names(background_rect) <- c("variable")
                 background_rect$freqper <-1
@@ -214,11 +208,8 @@ kobo_bar_multi_facet <- function(mainDir='') {
                     scale_y_continuous(labels=percent, limits = c(0,1))+
                     scale_fill_brewer(name=paste0(facetlabel),palette="PuBu")+
                     coord_flip()+
-                    ggtitle(str_wrap(listlabel,width=50),
-                            subtitle = str_wrap(paste0("Multiple choices question: Response rate to this question is ",percentresponse," of the total."),width=50))+
-                    theme(plot.title=element_text(face="bold", size=25),
-                          plot.subtitle=element_text(face="italic", size=22)
-                    )
+                    ggtitle(str_wrap(listlabel,width=50))+
+                    theme(plot.title=element_text(face="bold", size=25))
 
                   ggsave(filename=paste(mainDir, "/out/disagg_multi/",variablename,"_bar_multi_disagg_",facetname,".png",sep=""), width=12, height=10,units="in", dpi=300)
 

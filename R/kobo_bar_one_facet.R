@@ -181,6 +181,10 @@ kobo_bar_one_facet <- function(mainDir='') {
 
                           if (is.na(ordinal)==T | ordinal==""){
                               frequ<-frequ[with(frequ,order(freqper)),]
+                          }else{
+                            ordinal_choices <- as.character(selectchoices_questions[selectchoices_questions$qname==variablename,c("labelchoice")])
+                            frequ$data <- reorder.factor(frequ$Var1, new.order=ordinal_choices)
+                            frequ %>% arrange(data)
                           }
 
 
@@ -202,11 +206,8 @@ kobo_bar_one_facet <- function(mainDir='') {
                             scale_y_continuous(labels=percent, limits = c(0,1))+
                             scale_fill_brewer(name=paste0(facetlabel),palette="PuBu")+
                             coord_flip()+
-                            ggtitle(str_wrap(title,width=50),
-                                    subtitle = str_wrap(paste0("Multiple choices question: Response rate to this question is ",percentresponse," of the total."),width=55))+
-                            theme(plot.title=element_text(face="bold", size=25),
-                                  plot.subtitle=element_text(face="italic", size=22)
-                            )
+                            ggtitle(str_wrap(title,width=50))+
+                            theme(plot.title=element_text(face="bold", size=25))
                           # Saving graphs
                           ggsave(filename=paste(mainDir,"/out/disagg_one/",variablename,"_disagg_",facetname,"bar_one.png",sep=""), width=10, height=10,units="in", dpi=300)
                           cat(paste0("Generated bar chart for question: ",i, " ", title ," - with disaggregation on - ",j, " ",facetlabel, "  saved as image:   ", variablename,"_disagg_",facetname,"\n"))

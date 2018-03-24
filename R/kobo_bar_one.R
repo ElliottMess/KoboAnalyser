@@ -124,6 +124,10 @@ kobo_bar_one <- function(mainDir='') {
 
       if (is.na(ordinal)==T | ordinal==""){
         frequ$Var1<-factor(frequ$Var1, levels = frequ$Var1[order(frequ$freqper)])
+      }else{
+        ordinal_choices <- as.character(selectchoices_questions[selectchoices_questions$qname==variablename,c("labelchoice")])
+        frequ$Var1 <- reorder.factor(frequ$Var1, new.order=ordinal_choices)
+        frequ %>% arrange(Var1)
       }
 
       theme_set(theme_gray(base_size = 20))
@@ -137,12 +141,10 @@ kobo_bar_one <- function(mainDir='') {
         #facet_wrap(~subgov, ncol=4) +
         ylab("Frequency") +
         scale_y_continuous(labels=percent, limits = c(0,1))+
-        scale_fill_brewer("Blues")+
+        scale_fill_brewer("PuBu")+
         xlab("") +
         coord_flip() +
-        ggtitle(str_wrap(title,width=65),
-                subtitle = str_wrap(paste0("One choice question: Response rate to this question: ",percentresponse," of all respondents"),width=65))+
-
+        ggtitle(str_wrap(title,width=50))+
         theme( plot.title=element_text(face="bold", size=20),
               plot.background = element_rect(fill = "transparent",colour = NA))
       ggsave(filename=paste(mainDir,"/out/bar_one/",variablename,"_bar_one.png",sep=""), width=10, height=10,units="in", dpi=300)

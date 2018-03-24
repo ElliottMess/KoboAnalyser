@@ -153,11 +153,13 @@ kobo_bar_multi <- function(mainDir='') {
         castdata<- ddply(castdata, "variable",numcolwise(sum))
 
 
-        castdata$variable = str_wrap(castdata$variable,width=15)
 
-        if (is.na(ordinal)==T | ordinal==""){
-          castdata$variable<-factor(castdata$variable, levels = castdata$variable[order(castdata$freqper)])
-        }
+        #castdata$variable<-factor(castdata$variable, levels = castdata$variable[order(castdata$freqper)])
+
+        castdata <- arrange(castdata,freqper)
+
+        castdata$variable = str_wrap(castdata$variable,width=15)
+        castdata$variable <- factor(castdata$variable, levels=castdata$variable)
 
 
         theme_set(theme_gray(base_size = 20))
@@ -165,15 +167,15 @@ kobo_bar_multi <- function(mainDir='') {
 
         ggplot(castdata, aes(x=variable, y=freqper)) +
           geom_bar(fill="#2a87c8",colour="#2a87c8",stat = "identity") +
-          geom_text(aes(label=paste(round(freqper*100),"%",sep=""), hjust = -0.5))+
+          geom_text(aes(label=paste(round(freqper*100),"%",sep=""), hjust = -0.2))+
           xlab("") + ylab("")+
           scale_y_continuous(labels=percent, limits=c(0,1))+
+          scale_fill_brewer("PuBu")+
           coord_flip()+
-          ggtitle(str_wrap(listlabel,width=50),
-                  subtitle = str_wrap(paste0("Multiple choice question: Response rate to this question is ",percentresponse," of the total."),width=60))+
+          ggtitle(str_wrap(listlabel,width=50))+
           theme(plot.title=element_text(face="bold", size=22),
                 plot.background = element_rect(fill = "transparent",colour = NA))
-        ggsave(filename=paste(mainDir, "/out/bar_multi/bar_multi_",listloop,".png",sep=""), width=10, height=10,units="in", dpi=300)
+        ggsave(filename=paste(mainDir, "/out/bar_multi/bar_multi_",listfullname,".png",sep=""), width=10, height=10,units="in", dpi=300)
 
         cat(paste0("Generated bar chart for question: ", listlabel , "\n"))
         }

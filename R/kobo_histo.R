@@ -94,8 +94,7 @@ kobo_histo <- function(mainDir='') {
               geom_histogram(aes(y =..density..), fill="#2a87c8", alpha = .6, binwidth=0.5) +
               geom_density(adjust=2) +
               scale_x_continuous(expand = c(0,0)) +
-              ggtitle(wrapper(title,width=65),
-                      subtitle = wrapper(paste0("Response rate to this question is ",percentresponse," of the total."),width=65))+
+              ggtitle(wrapper(title,width=50))+
               labs(x="", y="Frequency")+
               theme(plot.title=element_text(face="bold", size=20),
                     plot.background = element_rect(fill = "transparent",colour = NA))
