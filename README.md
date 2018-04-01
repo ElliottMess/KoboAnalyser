@@ -1,8 +1,11 @@
+<<<<<<< HEAD
 ---
 output: 
   html_document: 
     toc: yes
 ---
+=======
+>>>>>>> 5600c1761a16b7bc70f95e43222561b8e2f0253a
 # Introduction
 KoboAnalyser is a R package to conduct data discovery and analysis for data collected through  KoboToolbox.
 The package is largely based on KoboloadeR (https://github.com/Edouard-Legoupil/koboloadeR) by Edouard Legoupil
@@ -12,7 +15,11 @@ The package is largely based on KoboloadeR (https://github.com/Edouard-Legoupil/
 ## Prerequisite
 To be able to use KoboAnalyser you will need:
 
+<<<<<<< HEAD
 * R: download here: https://cran.rstudio.com/). For Windows, choose "install R for the first time".
+=======
+* R: download here: https://cran.rstudio.com/). For Windows, choose “install R for the first time”.
+>>>>>>> 5600c1761a16b7bc70f95e43222561b8e2f0253a
 * RStudio  (https://www.rstudio.com/products/rstudio/download/#download)
 
 
@@ -21,6 +28,7 @@ To be able to use KoboAnalyser you will need:
 * Install RStudio: follow instruction from the installer
 * Launch RStudio
 
+<<<<<<< HEAD
 Install KoboAnalyser from Github (up to date version):
 
 * In the R console, install 'devtool' package:
@@ -40,11 +48,21 @@ Install KoboAnalyser from Zip package:
 * In Tools (top of RStudio): click Install Packages
 * Choose Install from: Package Archive File (.zip; .tar.gz)
 * In Package archive, select the file KoboAnalyser.tar.gz that you downloaded/received
+=======
+Install KoboAnalyser:
+
+* In Tools (top of RStudio): click Install Packages
+* Choose Install from: Package Archive File (.zip; .tar.gz)
+* In Package archive select to KoboAnalyser.tar.gz
+>>>>>>> 5600c1761a16b7bc70f95e43222561b8e2f0253a
 * Click Install
 
 * You are all set! You can know use KoboAnalyser
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5600c1761a16b7bc70f95e43222561b8e2f0253a
 ## Quick start
 First, create a project in RStudio:
 
@@ -61,15 +79,23 @@ Then setup a few things: run those two lines:
 library (KoboAnalyser) # This loads KoboAnalyser package
 kobo_projectinit() # Creats folders necessary and transfer files needed
 ```
+<<<<<<< HEAD
 It might take a while as a few other packages have to be installed or loaded. Once the see the " >" again at the beginning of the line, you can run:
 
 ```
 kobo_shiny("app_koboanalyser.R")
+=======
+It might take a while as a few other packages have to be installed or loaded. Once the see the “ >” again at the beginning of the line, you can run:
+
+```
+kobo_shiny("app_projectconfig.R")
+>>>>>>> 5600c1761a16b7bc70f95e43222561b8e2f0253a
 ```
 
 This will launch a graphic interface with other instructions and options.
 
 ## Troubleshooting
+<<<<<<< HEAD
 
 Before anything else, try to restart the R session:
 * In R studio, on top go to "Session"
@@ -99,6 +125,11 @@ It is most likely because you have the form, dictionnary or dataset open on your
  If you get this error:
 ```
 Error: package or namespace load failed for 'rJava'
+=======
+If you get this error:
+```
+Error: package or namespace load failed for ‘rJava’
+>>>>>>> 5600c1761a16b7bc70f95e43222561b8e2f0253a
 ```
 
 It could be because you have a 64bit version of R, but have a 32bit version of Java. Check this thread for guidance: https://stackoverflow.com/questions/37735108/r-error-onload-failed-in-loadnamespace-for-rjava
@@ -111,7 +142,11 @@ Here are a few introductions and tutorials for  R:
 
 * An introduction to R: complete but not very user-friendly: https://cran.r-project.org/doc/manuals/r-release/R-intro.html
 *	Try R: http://tryr.codeschool.com/
+<<<<<<< HEAD
 *	Data Camp's Introduction to R: https://www.datacamp.com/courses/free-introduction-to-r
+=======
+*	Data Camp’s Introduction to R: https://www.datacamp.com/courses/free-introduction-to-r
+>>>>>>> 5600c1761a16b7bc70f95e43222561b8e2f0253a
 
 To go further:
 *	https://www.rstudio.com/online-learning/
