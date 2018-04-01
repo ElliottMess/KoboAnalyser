@@ -1,8 +1,8 @@
-#' @name kobo_charts_questions
-#' @rdname kobo_charts_questions
-#' @title  Generates graphics based on the type of question and if there's a disaggregation
+#' @name kobo_question
+#' @rdname kobo_question
+#' @title  Generates graphics and basic information based on the type of question and if there's a disaggregation
 
-#' @description  Automatically generates bar charts and histograms based on the question type.
+#' @description  Automatically generates bar charts, histograms, and basic information of the question based on the question type.
 #'
 #'
 #' @param mainDir Path to the project's working directory: mainly for shiny app
@@ -12,17 +12,17 @@
 #' @author Elliott Messeiller
 #'
 #' @examples
-#' kobo_charts_questions("s2.beneficiary_code")
+#' kobo_question("s2.beneficiary_code")
 #'
-#' @export kobo_charts_questions
+#' @export kobo_question
 #' @examples
 #' \dontrun{
-#' kobo_charts_questions("s2.beneficiary_code")
+#' kobo_question("s2.beneficiary_code")
 #' }
 #'
 #'
 
-kobo_charts_questions <- function(mainDir='', question) {
+kobo_question <- function(question,mainDir='') {
   # Source project config parameters
   if (mainDir==''){
     mainDir <- getwd()
@@ -33,7 +33,8 @@ kobo_charts_questions <- function(mainDir='', question) {
   variablename <- as.character(select_question$fullname)
 
   #select_one, no disaggregation
-  if(select_question$type=="select_one" & is.na(select_question$disaggregation)){
+  if(select_question$type=="select_one"){
+    if(is.na(select_question$disaggregation) | select_question$disaggregation==""){
             ## Check that variable is in the dataset
 
             check <- as.data.frame(names(data))
@@ -71,7 +72,7 @@ kobo_charts_questions <- function(mainDir='', question) {
 
               #str(data.single)
 
-              data.single <- kobo_label(data.single, dico)
+              #data.single <- kobo_label(data.single, dico)
 
               data.single[data.single==""]<-NA
 
@@ -127,11 +128,17 @@ kobo_charts_questions <- function(mainDir='', question) {
                         plot.background = element_rect(fill = "transparent",colour = NA))
 
                 print(plotfreq)
+                frequ$freqper <- round(frequ$freqper*100,2)
+                names(frequ) <- c("Choices","# answered", "% answered")
+                print(frequ)
+                cat("\n")
+                print(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
+
 
   }
 
   # Select_one question with disaggregation
-  if(select_question$type=="select_one" & !is.na(select_question$disaggregation)){
+  if(is.na(select_question$disaggregation)){
                   check <- as.data.frame(names(data))
                   names(check)[1] <- "fullname"
                   check$id <- row.names(check)
@@ -141,8 +148,6 @@ kobo_charts_questions <- function(mainDir='', question) {
 
                   selectonet <- as.data.frame(selectone)
 
-                  selectfacet <- as.character(select_question[select_question$disaggregation!="" & select_question$disaggregation!="weight" , c("fullname")])
-                  selectfacet <- selectfacet[!is.na(selectfacet)]
 
                   # Replacing names by labels
                   selectchoices_questions <- dico[dico$type=="select_one_d"  , c("listname","name","labelchoice")]
@@ -170,13 +175,10 @@ kobo_charts_questions <- function(mainDir='', question) {
                   #str(data.single)
                   names(data.single)[1] <- variablename
 
-                  data.single <- kobo_label(data.single, dico)
+                  #data.single <- kobo_label(data.single, dico)
 
                   data.single[data.single==""]<-NA
 
-                  if(length(selectfacet)==0) {
-                    cat("There's no variable to disaggregate in your data analysis plan.\n")
-                  } else {  cat(paste0( length(selectfacet) , " variable(s) to disaggregate in your data analysis plan. Let's proceed! \n"))
 
                     selectfacett <- select_question[, c("fullname","disaggregation")]
 
@@ -227,6 +229,7 @@ kobo_charts_questions <- function(mainDir='', question) {
                             data.singlefacet$data <- data.single[,i]
 
                             count_replied <- as.numeric(sum(!is.na(data.single[,i ])))
+                            totalanswer <- as.numeric(nrow(data.single))
 
 
                             data.singlefacet[,1] <- data.frame(facetchoices[,2][match(data.singlefacet[,1],facetchoices[,1])], stringsAsFactors = FALSE)
@@ -286,14 +289,23 @@ kobo_charts_questions <- function(mainDir='', question) {
                               theme(plot.title=element_text(face="bold", size=25))
                             # Printing graphs
                             print(bar_one_facet_plot)
+
+                            frequ$freqper <- round(frequ$freqper*100,2)
+                            names(frequ) <- c("Choices","Disaggregation", "# answered", "% answered")
+                            print(frequ)
+                            cat("\n")
+                            print(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
+
+
                           }
                         }
-                      }
+
                     }
                   }
-  }
+  }}
   # Select_multiple question without disaggregation
-  if(select_question$type=="select_multiple_d" & is.na(select_question$disaggregation)){
+  if(select_question$type=="select_multiple_d"){
+    if(is.na(select_question$disaggregation) | select_question$disaggregation==""){
 
     selectdf <- dico[dico$type == "select_multiple" & dico$listname==select_question$listname, c("fullname","listname","label","name","disaggregation"), ]
 
@@ -312,7 +324,7 @@ kobo_charts_questions <- function(mainDir='', question) {
 
       selectmulti <- as.character(selectdf[, c("fullname")])
       data.selectmulti <- data [selectmulti ]
-      data.selectmulti  <- kobo_label(data.selectmulti, dico)
+      #data.selectmulti  <- kobo_label(data.selectmulti, dico)
 
       listmulti <- as.data.frame(select_question$listname)
       names(listmulti)[1] <- "listname"
@@ -407,7 +419,7 @@ kobo_charts_questions <- function(mainDir='', question) {
 
             castdata <- arrange(castdata,freqper)
 
-            castdata$variable = str_wrap(castdata$variable,width=15)
+            #castdata$variable = str_wrap(castdata$variable,width=15)
             castdata$variable <- factor(castdata$variable, levels=castdata$variable)
 
 
@@ -427,6 +439,13 @@ kobo_charts_questions <- function(mainDir='', question) {
 
             print(bar_multi)
 
+            castdata$freqper <- round(castdata$freqper*100,2)
+            names(castdata) <- c("Choices","# answered", "% answered")
+            print(castdata)
+            cat("\n")
+            print(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
+
+
           }
         }
 
@@ -438,12 +457,191 @@ kobo_charts_questions <- function(mainDir='', question) {
 
   }
   # Select_multiple question without disaggregation
-  if(select_question$type=="select_multiple_d" & !is.na(select_question$disaggregation)){
+  if(!is.na(select_question$disaggregation)){
+
+    ### Verify that those variables are actually in the original dataframe
+    check <- as.data.frame(names(data))
+    names(check)[1] <- "fullname"
+    check$id <- row.names(check)
+    selectdf <- join(x=select_question, y=check, by="fullname",  type="left")
+    selectdf <- selectdf[!is.na(selectdf$id), ]
+
+    allvar<-dico[, c("fullname","listname","label","name","disaggregation"), ]
+
+    ## now correct list of variables
+    selectone <- as.character(selectdf[selectdf$disaggregation!=""& selectdf$disaggregation!="weight", c("fullname")])
+    ## df of variable to loop around
+    selectonet <- as.data.frame(selectone)
 
 
-  }
+    if (nrow(selectdf)==0){
+      cat("There's no select_multiple questions \n")
+    } else{
+
+      ## get list of variables used for faceting
+      selectfacet <- as.character(selectdf[selectdf$disaggregation!="" & selectdf$fullname==variablename & selectdf$disaggregation!="weight", c("fullname")])
+      selectfacet <- selectfacet[!is.na(selectfacet)]
+
+      if(length(selectfacet)==0) {
+        cat("There's no variable to disaggregate in your data analysis plan.\n")
+
+      } else {  cat(paste0( length(selectfacet) , " variable(s) to disaggregate in your data analysis plan. Let's proceed! \n"))
+
+        selectmulti <- as.character(selectdf[, c("fullname")])
+        listname <- as.character(selectdf$listname)
+        selectmultichoices <- as.character(dico[dico$type=="select_multiple" & dico$listname==listname,c("fullname")])
+        data.selectmulti <- data [selectmultichoices]
+        #data.selectmulti  <- kobo_label(data.selectmulti, dico)
+
+        selectfacett <- selectdf[selectdf$disaggregation!=""& selectdf$disaggregation!="weight", c("fullname","disaggregation")]
+        single.facet <- as.data.frame(table(selectfacett[,2]))
+        single.facet <- as.data.frame(single.facet[single.facet$Var1!="",c("Var1")])
+        names(single.facet) <- "Var1"
+
+
+        listmulti <- dico[dico$type=="select_multiple_d", c("listname","label","name","fullname","disaggregation")]
+        selectdf1 <- as.data.frame(unique(selectdf$listname))
+        names(selectdf1)[1] <- "listname"
+        listmulti <- join(x=listmulti, y=selectdf1, by="listname", type="left")
+
+        listmultichoice <- dico[dico$type=="select_multiple_d", c("listname","label","name","fullname","disaggregation","labelchoice")]
+
+          listloop <- as.character(select_question$listname)
+          listlabel <-  as.character(select_question$label)
+
+
+          ### select variable for a specific multiple questions
+          selectmultilist <- as.character(dico[dico$type=="select_multiple" & dico$listname==listloop, c("fullname")])
+
+          ## Check that those variable are in the dataset
+          selectdf <- dico[dico$type=="select_multiple" & dico$listname==listloop & dico$qlevel==variablename , c("fullname","listname","label","name","disaggregation","labelchoice")]
+          selectdf2 <- join(x=selectdf, y=check, by="fullname",  type="left")
+          selectdf2 <- selectdf2[!is.na(selectdf2$id), ]
+
+          # If no answers to this question, passing to the next select_multiple
+          if (nrow(selectdf2)==0){ cat("Only empty values, passing. \n")
+          } else {
+
+            listlabelchoice <- as.character(selectdf2[,"labelchoice"])
+            selectmultilist <- as.character(selectdf2[, c("fullname")])
+            data.selectmultilist <- data.selectmulti[selectmultilist]
+            names(data.selectmultilist) <- listlabelchoice
+
+            # Listing the choices to the question
+            selectmultilist <- as.character(selectdf2[, c("fullname")])
+
+            ## Reshape answers
+            # Selecting only the answers to this question
+
+            data.selectmultilist <- data.selectmultilist[, colSums(!is.na(data.selectmultilist)) != 0]
+            if (ncol(data.selectmultilist)==0){ cat("Only empty values, passing. \n")
+            }else{
+
+              #Selecting only the answers selected at least once
+              data.selectmultilist <- sapply(data.selectmultilist, as.numeric)
+
+              data.selectmultilist <- data.frame(data.selectmultilist[, colSums(data.selectmultilist,na.rm=TRUE) != 0, drop=FALSE],check.names=FALSE)
+
+              for (j in 1:nrow(single.facet) ) {
+
+
+
+                  facetname1 <- as.character(single.facet[j,1])
+                  facetname <- as.character(allvar[allvar$name==facetname1,c("fullname")])
+
+                  facetlabel <- as.character(dico[dico$fullname==facetname,c("label")])
+                  facetchoices <- dico[dico$name==facetname1, c("name","labelchoice","listname")]
+                  facetchoices <-dico[dico$listname==facetchoices[,3], c("name","labelchoice","listname")]
+                  facetchoices <- facetchoices[facetchoices$name!=facetname1, c("name","labelchoice","listname")]
+
+                  # Put ID to each row
+
+                  data.selectmultilist$id <- rownames(data.selectmultilist)
+
+                  if(usedweight=="sampling_frame"){
+                    data.selectmultilist$weight <- data$weight
+                    names(data.selectmultilist$weight) <- "weight"
+                  }
+
+                  data.selectmultilist[facetname] <- data[facetname]
+                  names(data.selectmultilist)[length(names(data.selectmultilist))] <- "facet"
+
+
+
+                  #Count total answer (for the survey) and answered to this question
+
+                  totalanswer <- nrow(data.selectmultilist)
+                  count_replied <- as.numeric(sum(!is.na(data.selectmultilist[,1 ])))
+
+                  percentresponse <- paste(round((count_replied/totalanswer)*100,digits=2),"%",sep="")
+
+                  if(usedweight=="sampling_frame"){
+
+                    meltdata <- melt(data.selectmultilist,id=c("weight","id","facet"))
+
+                    castdata <- as.data.frame(table(meltdata[,c("value","variable","facet","weight")]))
+                    castdata$Freq <- as.numeric(as.character(castdata$Freq))
+                    castdata$weight <- as.numeric(as.character(castdata$weight))
+                    castdata$freqper <- round((castdata$Freq*castdata$weight)/count_replied,digits=2)
+                  }
+
+                  else{
+                    meltdata <- melt(data.selectmultilist,id=c("id","facet"))
+
+                    castdata <- as.data.frame(table(meltdata[,c("value","variable","facet")]))
+                    castdata$Freq <- as.numeric(as.character(castdata$Freq))
+                    castdata$freqper <- round((castdata$Freq)/count_replied,digits=2)
+                  }
+
+                  castdata <- castdata[castdata$value!=0, ]
+
+                  #combining values
+                  castdata<- ddply(castdata, c("variable","facet"),numcolwise(sum))
+
+                  castdata$variable = str_wrap(castdata$variable,width=15)
+
+                  background_rect <- data.frame(unique(castdata[,c("variable")]))
+                  names(background_rect) <- c("variable")
+                  background_rect$freqper <-1
+
+                  theme_set(theme_gray(base_size = 20)
+                  )
+
+                  bar_multi_disagg <- ggplot(castdata,aes(x=variable, y=freqper)) +
+                    geom_bar(data=background_rect,aes(x=variable),stat = "identity", alpha=0.2)+
+                    geom_bar(stat = "identity", position="dodge",aes(fill=facet))+
+                    geom_text(aes(label=paste(round(freqper*100),"%",sep=""), fill=facet, hjust = -0.5), position=position_dodge(width=0.8))+
+                    xlab("") + ylab("")+
+                    scale_y_continuous(labels=percent, limits = c(0,1))+
+                    scale_fill_brewer(name=paste0(facetlabel),palette="PuBu")+
+                    coord_flip()+
+                    ggtitle(str_wrap(listlabel,width=50))+
+                    theme(plot.title=element_text(face="bold", size=25))
+                  print(bar_multi_disagg)
+
+                  castdata$freqper <- round(castdata$freqper*100,2)
+                  names(castdata) <- c("Choices","Disaggregation", "# answered", "% answered")
+                  print(castdata)
+                  cat("\n")
+                  print(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
+
+
+
+
+            }
+          }
+        }
+      }
+    }
+
+
+  }}
   # Integer, decimal or calculat question without disaggregation
-  if(select_question$type=="integer" | select_question$type=="decimal" | select_question$type=="calculate" | select_question$name=c("__version__","_version_")){
+  if(select_question$type=="integer" | select_question$type=="decimal" | select_question$type=="calculate"){
+    if (select_question$name=="__version__" | select_question$name=="_version_"){
+      cat("Passing")}
+
+  else{
     check <- as.data.frame(names(data))
     names(check)[1] <- "fullname"
     check$id <- row.names(check)
@@ -463,7 +661,7 @@ kobo_charts_questions <- function(mainDir='', question) {
 
       ## force to data frame
       data.integer <- as.data.frame(data.integer)
-      data.integer  <- kobo_label(data.integer, dico)
+      #data.integer  <- kobo_label(data.integer, dico)
       wrapper <- function(x, ...)
       {
         paste(strwrap(x, ...), collapse = "\n")
@@ -472,13 +670,13 @@ kobo_charts_questions <- function(mainDir='', question) {
         # i <- 67
         title <- select_question$label
 
-        ## Ensure that the variable is recognised as integer
-        select.data.integer <- data.frame(as.numeric(na.omit(data.integer[ ,i])))
+        ## Ensure that the variable is recognised as numeric
+        select.data.integer <- data.frame(as.numeric(na.omit(data.integer[ ,1])))
         #str(data.integer[ , i])
 
         totalanswer <- nrow(data.integer)
 
-        count_replied <- (sum(!is.na(data.integer[,i ])))
+        count_replied <- (sum(!is.na(data.integer[,1 ])))
 
         percentresponse <- paste(round((count_replied/totalanswer*100),digits=2),"%",sep="")
 
@@ -495,9 +693,15 @@ kobo_charts_questions <- function(mainDir='', question) {
           theme(plot.title=element_text(face="bold", size=20),
                 plot.background = element_rect(fill = "transparent",colour = NA))
         print(histograms)
+        names(select.data.integer) <- select_question$label
+        print(summary(select.data.integer))
+        cat("\n")
+        print(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
 
-      }
+
     }
+  }
+  }
 
 
 

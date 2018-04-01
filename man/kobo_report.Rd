@@ -4,10 +4,13 @@
 \alias{kobo_report}
 \title{Generate the analysis}
 \usage{
-kobo_report()
+kobo_report(mainDir = "")
+}
+\arguments{
+\item{mainDir}{Path to the project's working directory: mainly for proper shiny app path}
 }
 \description{
-Automatically generate the report.
+Automatically generate the report with
 }
 \examples{
 kobo_report()

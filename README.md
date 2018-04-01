@@ -21,14 +21,29 @@ To be able to use KoboAnalyser you will need:
 * Install RStudio: follow instruction from the installer
 * Launch RStudio
 
-Install KoboAnalyser:
+Install KoboAnalyser from Github (up to date version):
+
+* In the R console, install 'devtool' package:
+```
+install.packages("devtools")
+```
+* Install KoboAnalyser:
+```
+library(devtools)
+install_github("ElliottMess/KoboAnalyser")
+
+```
+* You are all set! You can know use KoboAnalyser
+
+Install KoboAnalyser from Zip package:
 
 * In Tools (top of RStudio): click Install Packages
 * Choose Install from: Package Archive File (.zip; .tar.gz)
-* In Package archive select to KoboAnalyser.tar.gz
+* In Package archive, select the file KoboAnalyser.tar.gz that you downloaded/received
 * Click Install
 
 * You are all set! You can know use KoboAnalyser
+
 
 ## Quick start
 First, create a project in RStudio:
