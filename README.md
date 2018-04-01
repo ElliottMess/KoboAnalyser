@@ -70,6 +70,11 @@ kobo_shiny("app_koboanalyser.R")
 This will launch a graphic interface with other instructions and options.
 
 ## Troubleshooting
+
+Before anything else, try to restart the R session:
+* In R studio, on top go to "Session"
+* "Restart R"
+
 ### The application crashed
 If the application (graphic interface) crashes, make sure that all packages necessary are loaded with:
 ```
@@ -83,7 +88,7 @@ Also make sure that you downloaded your data in the right format:
 
 ### Error when building the dictionnary or configuration file
 
-If you see this message:
+If you see this message (or similar error):
 ```
 Error in file(file, ifelse(append, "a", "w")) : 
   cannot open the connection
