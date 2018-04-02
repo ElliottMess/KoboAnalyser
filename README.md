@@ -1,7 +1,6 @@
 ---
-output: 
-  html_document: 
-    toc: yes
+output: html_document
+  toc: yes
 ---
 
 # Introduction
