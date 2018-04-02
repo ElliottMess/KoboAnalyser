@@ -691,7 +691,7 @@ kobo_question <- function(question,mainDir='') {
           ggtitle(wrapper(title,width=50))+
           labs(x="", y="Frequency")+
           theme(plot.title=element_text(face="bold", size=20),
-                plot.background = element_rect(fill = "transparent",colour = NA))
+                  plot.background = element_rect(fill = "transparent",colour = NA))
         print(histograms)
         names(select.data.integer) <- select_question$label
         print(summary(select.data.integer))

@@ -3,7 +3,6 @@ output:
   html_document: 
     toc: yes
 ---
-=======
 # Introduction
 KoboAnalyser is a R package to conduct data discovery and analysis for data collected through  KoboToolbox.
 The package is largely based on KoboloadeR (https://github.com/Edouard-Legoupil/koboloadeR) by Edouard Legoupil
@@ -14,7 +13,7 @@ The package is largely based on KoboloadeR (https://github.com/Edouard-Legoupil/
 To be able to use KoboAnalyser you will need:
 
 * R: download here: https://cran.rstudio.com/). For Windows, choose "install R for the first time".
-=======
+
 * R: download here: https://cran.rstudio.com/). For Windows, choose “install R for the first time”.
 * RStudio  (https://www.rstudio.com/products/rstudio/download/#download)
 
