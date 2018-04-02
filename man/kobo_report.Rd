@@ -10,7 +10,7 @@ kobo_report(mainDir = "")
 \item{mainDir}{Path to the project's working directory: mainly for proper shiny app path}
 }
 \description{
-Automatically generate the report with
+Automatically generate the report with all variable analysed
 }
 \examples{
 kobo_report()

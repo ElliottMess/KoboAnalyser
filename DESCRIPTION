@@ -9,4 +9,12 @@ Description: Run analysis for data collected through the KoboToolbox.
 License: GPL-3
 LazyData: TRUE
 Depends:
+    ggplot2,
+    survey,
+    readxl,
+    devtools,
+    knitr,
+    pander,
+    xtable,
+    rmarkdown
 RoxygenNote: 6.0.1

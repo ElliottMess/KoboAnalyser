@@ -2,7 +2,7 @@
 #' @rdname kobo_report
 #' @title  Generate the analysis
 
-#' @description  Automatically generate the report with
+#' @description  Automatically generate the report with all variable analysed
 #'
 #' @author Edouard Legoupil, Elliott Messeiller
 #' @param mainDir Path to the project's working directory: mainly for proper shiny app path
