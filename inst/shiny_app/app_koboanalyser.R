@@ -310,7 +310,7 @@ server <- function(input, output,session) {
     filename = "report.doc",
     content = function(file) {
       file.copy(paste0(mainDir,"/code/report.Rmd"), paste0(mainDir,"/out"),overwrite = TRUE)
-      report<- paste0(mainDir,"/code/report.Rmd")
+      tempReport<- paste0(mainDir,"/code/report.Rmd")
       # Knit the document, passing in the `params` list, and eval it in a
       # child of the global environment (this isolates the code in the document
       # from the code in this app).
