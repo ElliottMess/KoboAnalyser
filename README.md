@@ -1,6 +1,5 @@
 ---
 output: html_document
-  toc: TRUE
 ---
 
 # Introduction
