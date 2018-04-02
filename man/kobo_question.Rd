@@ -12,7 +12,7 @@ kobo_question(question, mainDir = "")
 \item{mainDir}{Path to the project's working directory: mainly for shiny app}
 }
 \description{
-Automatically generates bar charts, histograms, and basic information of the question based on the question type.
+Automatically generates bar charts, histograms, and basic information of the question based on the question type to generate the report.
 }
 \examples{
 kobo_question("s2.beneficiary_code")

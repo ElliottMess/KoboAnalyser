@@ -2,7 +2,7 @@
 #' @rdname kobo_question
 #' @title  Generates graphics and basic information based on the type of question and if there's a disaggregation
 
-#' @description  Automatically generates bar charts, histograms, and basic information of the question based on the question type.
+#' @description  Automatically generates bar charts, histograms, and basic information of the question based on the question type to generate the report.
 #'
 #'
 #' @param mainDir Path to the project's working directory: mainly for shiny app
@@ -32,9 +32,9 @@ kobo_question <- function(question,mainDir='') {
   select_question <- dico[dico$fullname==question & dico$formpart=="questions", c("type","fullname","listname","label","name","disaggregation","labelchoice","ordinal")]
   variablename <- as.character(select_question$fullname)
 
-  #select_one, no disaggregation
-  if(select_question$type=="select_one"){
-    if(is.na(select_question$disaggregation) | select_question$disaggregation==""){
+  #   select_one, no disaggregation
+
+  if(select_question$type=="select_one" & select_question$disaggregation==""){
             ## Check that variable is in the dataset
 
             check <- as.data.frame(names(data))
@@ -92,7 +92,7 @@ kobo_question <- function(question,mainDir='') {
                 names(frequ)<- c("Var1","Freq")
 
                 frequ$freqper <- as.numeric(frequ$Freq/sum(frequ$Freq))
-                frequ$Var1 = str_wrap(frequ$Var1,width=15)
+
 
 
                 totalanswer <- nrow(data.single)
@@ -108,8 +108,11 @@ kobo_question <- function(question,mainDir='') {
                   frequ$Var1 <- reorder.factor(frequ$Var1, new.order=ordinal_choices)
                   frequ %>% arrange(Var1)
                 }
+                frequ_print <- frequ
+                frequ$Var1 = str_wrap(frequ$Var1,width=15)
 
-                theme_set(theme_gray(base_size = 20))
+
+                theme_set(theme_gray(base_size = 10))
                 color<-"#2a87c8"
 
 
@@ -124,21 +127,22 @@ kobo_question <- function(question,mainDir='') {
                   xlab("") +
                   coord_flip() +
                   ggtitle(str_wrap(title,width=50))+
-                  theme( plot.title=element_text(face="bold", size=20),
+                  theme( plot.title=element_text(face="bold", size=14),
                         plot.background = element_rect(fill = "transparent",colour = NA))
-
-                print(plotfreq)
-                frequ$freqper <- round(frequ$freqper*100,2)
-                names(frequ) <- c("Choices","# answered", "% answered")
-                print(frequ)
                 cat("\n")
-                print(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
-
+                print(plotfreq)
+                cat("\n")
+                frequ_print$freqper <- round(frequ$freqper*100,2)
+                names(frequ_print) <- c("Choices","# answered", "% answered")
+                print(kable(frequ_print))
+                cat("\n")
+                cat(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
+                cat("\n")
 
   }
 
   # Select_one question with disaggregation
-  if(is.na(select_question$disaggregation)){
+  if(select_question$type=="select_one" & select_question$disaggregation!=""){
                   check <- as.data.frame(names(data))
                   names(check)[1] <- "fullname"
                   check$id <- row.names(check)
@@ -250,7 +254,6 @@ kobo_question <- function(question,mainDir='') {
                             }
 
                             frequ$freqper <- frequ$Freq/count_replied
-                            frequ$data = str_wrap(frequ$data,width=15)
                             frequ <- frequ[frequ$facet!=facetlabel,c("data","facet", "Freq","freqper")]
 
 
@@ -266,6 +269,8 @@ kobo_question <- function(question,mainDir='') {
                               frequ %>% arrange(data)
                             }
 
+                            frequ_print <- frequ
+                            frequ$data = str_wrap(frequ$data,width=15)
 
 
                             ## and now the graph
@@ -274,7 +279,7 @@ kobo_question <- function(question,mainDir='') {
                             names(background_rect) <- c("data")
                             background_rect$freqper <-1
 
-                            theme_set(theme_gray(base_size = 20))
+                            theme_set(theme_gray(base_size = 10))
 
 
                             bar_one_facet_plot <- ggplot(frequ,aes(x=data, y=freqper)) +
@@ -286,26 +291,27 @@ kobo_question <- function(question,mainDir='') {
                               scale_fill_brewer(name=paste0(facetlabel),palette="PuBu")+
                               coord_flip()+
                               ggtitle(str_wrap(title,width=50))+
-                              theme(plot.title=element_text(face="bold", size=25))
+                              theme(plot.title=element_text(face="bold", size=14))
                             # Printing graphs
-                            print(bar_one_facet_plot)
-
-                            frequ$freqper <- round(frequ$freqper*100,2)
-                            names(frequ) <- c("Choices","Disaggregation", "# answered", "% answered")
-                            print(frequ)
                             cat("\n")
-                            print(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
-
+                            print(bar_one_facet_plot)
+                            cat("\n")
+                            frequ_print$freqper <- round(frequ$freqper*100,2)
+                            names(frequ_print) <- c("Choices","Disaggregation", "# answered", "% answered")
+                            print(kable(frequ_print))
+                            cat("\n")
+                            cat(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
+                            cat("\n")
 
                           }
                         }
 
                     }
                   }
-  }}
+    }
+
   # Select_multiple question without disaggregation
-  if(select_question$type=="select_multiple_d"){
-    if(is.na(select_question$disaggregation) | select_question$disaggregation==""){
+  if(select_question$type=="select_multiple_d" & select_question$disaggregation==""){
 
     selectdf <- dico[dico$type == "select_multiple" & dico$listname==select_question$listname, c("fullname","listname","label","name","disaggregation"), ]
 
@@ -418,12 +424,12 @@ kobo_question <- function(question,mainDir='') {
             #castdata$variable<-factor(castdata$variable, levels = castdata$variable[order(castdata$freqper)])
 
             castdata <- arrange(castdata,freqper)
-
-            #castdata$variable = str_wrap(castdata$variable,width=15)
+            castdata_print <- castdata
+            castdata$variable = str_wrap(castdata$variable,width=15)
             castdata$variable <- factor(castdata$variable, levels=castdata$variable)
 
 
-            theme_set(theme_gray(base_size = 20))
+            theme_set(theme_gray(base_size = 10))
 
 
             bar_multi <- ggplot(castdata, aes(x=variable, y=freqper)) +
@@ -434,16 +440,16 @@ kobo_question <- function(question,mainDir='') {
               scale_fill_brewer("PuBu")+
               coord_flip()+
               ggtitle(str_wrap(listlabel,width=50))+
-              theme(plot.title=element_text(face="bold", size=22),
+              theme(plot.title=element_text(face="bold", size=14),
                     plot.background = element_rect(fill = "transparent",colour = NA))
-
-            print(bar_multi)
-
-            castdata$freqper <- round(castdata$freqper*100,2)
-            names(castdata) <- c("Choices","# answered", "% answered")
-            print(castdata)
             cat("\n")
-            print(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
+            print(bar_multi)
+            cat("\n")
+            castdata_print$freqper <- round(castdata$freqper*100,2)
+            names(castdata_print) <- c("Choices","# answered", "% answered")
+            print(kable(castdata_print))
+            cat("\n")
+            cat(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
 
 
           }
@@ -457,7 +463,7 @@ kobo_question <- function(question,mainDir='') {
 
   }
   # Select_multiple question without disaggregation
-  if(!is.na(select_question$disaggregation)){
+  if(select_question$type=="select_multiple_d" & select_question$disaggregation==""){
 
     ### Verify that those variables are actually in the original dataframe
     check <- as.data.frame(names(data))
@@ -597,7 +603,7 @@ kobo_question <- function(question,mainDir='') {
 
                   #combining values
                   castdata<- ddply(castdata, c("variable","facet"),numcolwise(sum))
-
+                  castdata_print <- castdata
                   castdata$variable = str_wrap(castdata$variable,width=15)
 
                   background_rect <- data.frame(unique(castdata[,c("variable")]))
@@ -617,11 +623,13 @@ kobo_question <- function(question,mainDir='') {
                     coord_flip()+
                     ggtitle(str_wrap(listlabel,width=50))+
                     theme(plot.title=element_text(face="bold", size=25))
-                  print(bar_multi_disagg)
 
-                  castdata$freqper <- round(castdata$freqper*100,2)
-                  names(castdata) <- c("Choices","Disaggregation", "# answered", "% answered")
-                  print(castdata)
+                  cat("\n")
+                  print(bar_multi_disagg)
+                  cat("\n")
+                  castdata_print$freqper <- round(castdata$freqper*100,2)
+                  names(castdata_print) <- c("Choices","Disaggregation", "# answered", "% answered")
+                  print(kable(castdata_print))
                   cat("\n")
                   print(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
 
@@ -635,7 +643,7 @@ kobo_question <- function(question,mainDir='') {
     }
 
 
-  }}
+  }
   # Integer, decimal or calculat question without disaggregation
   if(select_question$type=="integer" | select_question$type=="decimal" | select_question$type=="calculate"){
     if (select_question$name=="__version__" | select_question$name=="_version_"){
@@ -662,10 +670,6 @@ kobo_question <- function(question,mainDir='') {
       ## force to data frame
       data.integer <- as.data.frame(data.integer)
       #data.integer  <- kobo_label(data.integer, dico)
-      wrapper <- function(x, ...)
-      {
-        paste(strwrap(x, ...), collapse = "\n")
-      }
         # for (i in 1:2 ) {
         # i <- 67
         title <- select_question$label
@@ -680,7 +684,7 @@ kobo_question <- function(question,mainDir='') {
 
         percentresponse <- paste(round((count_replied/totalanswer*100),digits=2),"%",sep="")
 
-        theme_set(theme_gray(base_size = 18))
+        theme_set(theme_gray(base_size = 10))
 
 
         # trendline on histogram by adding geom_density
@@ -688,15 +692,20 @@ kobo_question <- function(question,mainDir='') {
           geom_histogram(aes(y =..density..), fill="#2a87c8", alpha = .6, binwidth=0.5) +
           geom_density(adjust=2) +
           scale_x_continuous(expand = c(0,0)) +
-          ggtitle(wrapper(title,width=50))+
+          ggtitle(str_wrap(title,width=50))+
           labs(x="", y="Frequency")+
-          theme(plot.title=element_text(face="bold", size=20),
+          theme(plot.title=element_text(face="bold", size=14),
                   plot.background = element_rect(fill = "transparent",colour = NA))
+        cat("\n")
         print(histograms)
+        cat("\n")
+        cat("\n")
+
         names(select.data.integer) <- select_question$label
         print(summary(select.data.integer))
         cat("\n")
-        print(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
+        cat(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
+        cat("\n")
 
 
     }
