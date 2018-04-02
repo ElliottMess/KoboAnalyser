@@ -8,8 +8,6 @@ The package is largely based on KoboloadeR (https://github.com/Edouard-Legoupil/
 To be able to use KoboAnalyser you will need:
 
 * R: download here: https://cran.rstudio.com/). For Windows, choose "install R for the first time".
-
-* R: download here: https://cran.rstudio.com/). For Windows, choose “install R for the first time”.
 * R Studio  (https://www.rstudio.com/products/rstudio/download/#download)
 
 
