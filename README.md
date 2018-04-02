@@ -1,6 +1,5 @@
 ---
-output: html_document: 
-  toc: TRUE
+output: html_document
 ---
 
 # Introduction
@@ -15,13 +14,13 @@ To be able to use KoboAnalyser you will need:
 * R: download here: https://cran.rstudio.com/). For Windows, choose "install R for the first time".
 
 * R: download here: https://cran.rstudio.com/). For Windows, choose “install R for the first time”.
-* RStudio  (https://www.rstudio.com/products/rstudio/download/#download)
+* R Studio  (https://www.rstudio.com/products/rstudio/download/#download)
 
 
 ## Installation
 * Install R: follow instruction from the installer.
-* Install RStudio: follow instruction from the installer
-* Launch RStudio
+* Install R Studio: follow instruction from the installer
+* Launch R Studio
 
 ### Install KoboAnalyser from Github (up to date version):
 
@@ -39,15 +38,15 @@ install_github("ElliottMess/KoboAnalyser")
 
 ### Install KoboAnalyser from Zip package:
 
-* In Tools (top of RStudio): click Install Packages
+* In Tools (top of R Studio): click Install Packages
 * Choose Install from: Package Archive File (.zip; .tar.gz)
 * In Package archive, select the file KoboAnalyser.tar.gz that you downloaded/received
 * You are all set! You can know use KoboAnalyser
 
 ## Quick start
-First, create a project in RStudio:
+First, create a project in R Studio:
 
-* In RSturdio, select File, click New project. A box opens
+* In R Studio, select File, click New project. A box opens
 * Choose New Directory
 * Choose Empty project
 * Type the name of the folder where you want to put your data
@@ -83,7 +82,7 @@ Also make sure that you downloaded your data in the right format:
 * Export as XLS
 * XML values and headers
 * Include groups in headers
-* 'Group seperator' as dot ('.')
+* 'Group separator' as dot ('.')
 
 ### Error when building the dictionnary or configuration file
 
@@ -92,7 +91,7 @@ If you see this message (or similar error):
 Error in file(file, ifelse(append, "a", "w")) : 
   cannot open the connection
 ```
-It is most likely because you have the form, dictionnary or dataset open on your computer. If you close it and start over, the problem should be fixed.
+It is most likely because you have the form, dictionary or data set open on your computer. If you close it and start over, the problem should be fixed.
   
 ### Error when loading packages
  If you get this error:
