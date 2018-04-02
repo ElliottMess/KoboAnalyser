@@ -1,6 +1,7 @@
 ---
-output: github_document
-  toc: TRUE
+output: 
+  html_document: 
+    toc: yes
 ---
 
 # Introduction
