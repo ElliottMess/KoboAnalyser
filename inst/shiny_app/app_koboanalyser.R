@@ -9,183 +9,181 @@ ui <-
   fluidPage(
 
 
-  tabsetPanel(
+    tabsetPanel(
 
       tabPanel("Introduction",
-            fluidRow(
-              h1("Welcome to KoboAnalyser!", align="center"),
-              p("This tool will allow to explore your data collected through Kobo. ", align="center"),
-              column(5,
-                  h2("Content of the tool"),
-                  tags$ol(
-                    tags$li(strong("Introduction")," (where you are right now): explaination of the main features of the  and a few instructions"),
-                    tags$li(strong("Project configuration:")," uploading your form and data"),
-                    tags$li(strong("Output:")," uploading your form and data")
-                  ),
-                  br(),
-                  p("You can access those with the tabulations on the top of the page.",strong(" Watch out"), "Project configuration is needed !")
+               fluidRow(
+                 h1("Welcome to KoboAnalyser!", align="center"),
+                 p("This tool will allow to explore your data collected through Kobo. ", align="center"),
+                 column(5,
+                        h2("Content of the tool"),
+                        tags$ol(
+                          tags$li(strong("Introduction")," (where you are right now): explaination of the main features of the  and a few instructions"),
+                          tags$li(strong("Project configuration:")," uploading your form and data"),
+                          tags$li(strong("Output:")," uploading your form and data")
+                        ),
+                        br(),
+                        p("You can access those with the tabulations on the top of the page.",strong(" Watch out"), "Project configuration is needed !")
 
 
-              ),
-              column(5, offset = 1,
-                     h2("Features"),
-                     tags$ol(
-                      tags$li(strong("Generate a data exploration report")," with bar graphs, summary and crosstabulation for all the questions in your form, including one disaggregation and your data analysis plan."),
-                      tags$li(strong("Generate bar graphs")," for all the questions in your form, including with one disaggregation"),
-                      tags$li(strong("Weight")," your data according to your sammpling frame"),
-                      tags$li(strong("Calculate indicators:")," add variables with the data analysis plan.")
-                     ),
-                     br(),
-                     p("You can access those with the 'Output' tab on the top of the page.",strong(" Watch out"), "Project configuration is needed !")
+                 ),
+                 column(5, offset = 1,
+                        h2("Features"),
+                        tags$ol(
+                          tags$li(strong("Generate a data exploration report")," with bar graphs, summary and crosstabulation for all the questions in your form, including one disaggregation and your data analysis plan."),
+                          tags$li(strong("Generate bar graphs")," for all the questions in your form, including with one disaggregation"),
+                          tags$li(strong("Weight")," your data according to your sammpling frame"),
+                          tags$li(strong("Calculate indicators:")," add variables with the data analysis plan.")
+                        ),
+                        br(),
+                        p("You can access those with the 'Output' tab on the top of the page.",strong(" Watch out"), "Project configuration is needed !")
 
 
-              )
-            ),
-            br(),
-            br(),
-            fluidRow(
-              column(12, offset = 5,
-              h2("  Instruction")
-              ),
-              column(5,
-                h3("Export data from Kobo"),
-                p("Both your form and data should be downloaded directly from kobo."),
-                p("When exporting your data from Kobo:"),
-                tags$ol(
-                  tags$li("Select 'export type' as XLS"),
-                  tags$li('XML values and headers'),
-                  tags$li('Include groups in headers'),
-                  tags$li("and 'Group seperator' as dot ('.') (see image below) ")
-                ),
-                p(strong("DO NOT"),"change the name of the columns or any cells in the data. Everything should be exactly as in the form."),
-                img(src="exportformat.png", width=200)
-              ),
-              column(5, offset = 1,
-                  h3("Use the XLSform template supplied"),
-                     p("In the folder 'code', you will find a XLSform template.",
-                       br(),
-                       "You will see that this template has three extra sheets:",
-                       tags$ol(
-                         tags$li("'analysis_plan': where you can define your indicators or new variables if need"),
-                         tags$li("'sampling_frame': where you can specify your sampling frame to weight your data according to the method given in Project Configuration"),
-                         tags$li("'instruction': help on how to fill the new XLSform.")
-                       ),
-                       "Please see the 'instruction' on how to setup your XLSform for KoboAnalyser")
+                 )
+               ),
+               br(),
+               br(),
+               fluidRow(
+                 column(12, offset = 5,
+                        h2("  Instruction")
+                 ),
+                 column(5,
+                        h3("Export data from Kobo"),
+                        p("Both your form and data should be downloaded directly from kobo."),
+                        p("When exporting your data from Kobo:"),
+                        tags$ol(
+                          tags$li("Select 'export type' as XLS"),
+                          tags$li('XML values and headers'),
+                          tags$li('Include groups in headers'),
+                          tags$li("and 'Group seperator' as dot ('.') (see image below) ")
+                        ),
+                        p(strong("DO NOT"),"change the name of the columns or any cells in the data. Everything should be exactly as in the form."),
+                        img(src="exportformat.png", width=200)
+                 ),
+                 column(5, offset = 1,
+                        h3("Use the XLSform template supplied"),
+                        p("In the folder 'code', you will find a XLSform template.",
+                          br(),
+                          "You will see that this template has three extra sheets:",
+                          tags$ol(
+                            tags$li("'analysis_plan': where you can define your indicators or new variables if need"),
+                            tags$li("'sampling_frame': where you can specify your sampling frame to weight your data according to the method given in Project Configuration"),
+                            tags$li("'instruction': help on how to fill the new XLSform.")
+                          ),
+                          "Please see the 'instruction' on how to setup your XLSform for KoboAnalyser")
 
-                       )
-                     )
+                 )
+               )
 
       ),
 
       tabPanel("Project configuration",
 
-      titlePanel("Configuring a few elements for your project"),
+               titlePanel("Configuring a few elements for your project"),
 
 
-      mainPanel(
+               mainPanel(
 
-      fluidRow(
-      #list files in "data" and make dropdown of choices. then select sheets to be used for data, analysis plan and sampling
-      column(5,
-        fileInput("datafile", label = h4("Select the file with the data"),accept = c(".xlsx",".xls",".csv")),
-        uiOutput("data_sheet")
+                 fluidRow(
+                   #list files in "data" and make dropdown of choices. then select sheets to be used for data, analysis plan and sampling
+                   column(5,
+                          fileInput("datafile", label = h4("Select the file with the data"),accept = c(".xlsx",".xls",".csv")),
+                          uiOutput("data_sheet")
+                   ),
+                   column(5, offset = 2,
+                          fileInput("form", label = h4("Select the file with the form"),accept = c(".xlsx"))
+                   )),
+
+                 fluidRow(
+                   column(5,
+                          radioButtons("weighting_sys", h4("What kind of weighting system did you use?"),
+                                       choices = c("None"="none",
+                                                   "Sampling Frame"="sampling_frame"))
+                   ),
+                   column(4,
+                          conditionalPanel(condition='input.weighting_sys=="sampling_frame"',
+                                           radioButtons("sampling", h5("What kind of sampling methode did you use?"),
+                                                        choices = c("Simple random"="simple_random",
+                                                                    "2 stages random -st1"="2_stages",
+                                                                    "cluster sampling"="cluster_sampling"))
+                          )
+                   )
+                 ),
+                 fluidRow(
+                   radioButtons("analysis_plan", h4("Did you use the analysis plan sheet?"),
+                                choices = c("No"="n",
+                                            "Yes"="y")),
+                   uiOutput("files_uploaded")
+
+
+                 ),
+                 fluidRow(
+
+                   h2("Information about the report"),
+                   column(10,
+                          textInput("report_name", "Name of the report"),
+                          textInput("location", "Where is the report written"),
+                          textInput("author", "What is your name (author)?"),
+                          textInput("organisation", "What is your organisation?")
+                   )
+                 )
+               ),
+               sidebarPanel(
+                 h3("When you are all set, upload the files!"),
+                 br(),
+                 actionButton("upload_files",label = "Upload files"),
+                 br(),
+                 br(),
+                 htmlOutput("textmessage"),
+                 br(),
+                 br(),
+                 uiOutput("dico"),
+                 br(),
+                 br(),
+                 htmlOutput("dicomessage")
+
+
+
+               )
       ),
-      column(5, offset = 2,
-        fileInput("form", label = h4("Select the file with the form"),accept = c(".xlsx"))
-      )),
 
-      fluidRow(
-        column(5,
-          radioButtons("weighting_sys", h4("What kind of weighting system did you use?"),
-                       choices = c("None"="none",
-                                   "Sampling Frame"="sampling_frame"))
-        ),
-        column(4,
-          conditionalPanel(condition='input.weighting_sys=="sampling_frame"',
-                           radioButtons("sampling", h5("What kind of sampling methode did you use?"),
-                                        choices = c("Simple random"="simple_random",
-                                                    "2 stages random -st1"="2_stages",
-                                                    "cluster sampling"="cluster_sampling"))
-                           )
-          )
-        ),
-      fluidRow(
-        radioButtons("analysis_plan", h4("Did you use the analysis plan sheet?"),
-                     choices = c("No"="n",
-                                 "Yes"="y")),
-        uiOutput("files_uploaded")
+      tabPanel("Output",
+               titlePanel("Output"),
+               sidebarLayout(position="left",
+                             mainPanel(
+                               h4("Bar graphs for select_one questions"),
+                               actionButton("bar_one", "Generate graphs"),
 
+                               h4("Bar graphs for select_one questions with disaggregation"),
+                               actionButton("bar_one_facet", "Generate graphs"),
 
-      ),
-      fluidRow(
+                               h4("Bar graphs for select_multiple questions"),
+                               actionButton("bar_multi", "Generate graphs"),
 
-        h2("Information about the report"),
-        column(5,
-        textInput("report_name", "Name of the report"),
-        textInput("location", "Where is the report written")
-        ),
-        column(5,
-        textInput("author", "What is your name (author)?"),
-        textInput("organisation", "What is your organisation?")
-        )
+                               h4("Bar graphs for select_multiple questions with disaggregation"),
+                               actionButton("bar_multi_facet", "Generate graphs"),
+
+                               h4("Histograms for integer,decimal, and calculate questions with disaggregation"),
+                               actionButton("histo", "Generate graphs")
+
+                             ),
+
+                             sidebarPanel(
+                               h4("Download outputs"),
+                               downloadButton("report", "Generate report")
+
+                             )
+               )
+
       )
-      ),
-      sidebarPanel(
-        h3("When you are all set, upload the files!"),
-        br(),
-        actionButton("upload_files",label = "Upload files"),
-        br(),
-        br(),
-        htmlOutput("textmessage"),
-        br(),
-        br(),
-        uiOutput("dico"),
-        br(),
-        br(),
-        htmlOutput("dicomessage")
-
-
-
-      )
-    ),
-
-    tabPanel("Output",
-        titlePanel("Output"),
-        sidebarLayout(position="left",
-          mainPanel(
-            h4("Bar graphs for select_one questions"),
-            actionButton("bar_one", "Generate graphs"),
-
-            h4("Bar graphs for select_one questions with disaggregation"),
-            actionButton("bar_one_facet", "Generate graphs"),
-
-            h4("Bar graphs for select_multiple questions"),
-            actionButton("bar_multi", "Generate graphs"),
-
-            h4("Bar graphs for select_multiple questions with disaggregation"),
-            actionButton("bar_multi_facet", "Generate graphs"),
-
-            h4("Histograms for integer,decimal, and calculate questions with disaggregation"),
-            actionButton("histo", "Generate graphs")
-
-          ),
-
-          sidebarPanel(
-            h4("Download outputs"),
-            downloadButton("report", "Generate report")
-
-          )
-        )
-
     )
   )
-)
 
 server <- function(input, output,session) {
   mainDir <-getwd()
   mainDir <- dirname(dirname(mainDir))
 
-    #Move the data and form to the data folder
+  #Move the data and form to the data folder
   observeEvent(input$upload_files,{
     inFile_data <- input$datafile
     file.copy(inFile_data$datapath,file.path(mainDir,"/data/",inFile_data$name),overwrite = T)
@@ -269,7 +267,7 @@ server <- function(input, output,session) {
 
   output$data_sheet  <- renderUI({
     inFile <- input$datafile
-      if(is.null(inFile)) return(NULL)
+    if(is.null(inFile)) return(NULL)
     data_sheets <- excel_sheets(inFile$datapath)
     radioButtons("data_sheet","Select the sheet with your data",data_sheets)
   })
@@ -319,8 +317,9 @@ server <- function(input, output,session) {
                           envir = new.env(parent = globalenv())
 
         )
-      )
+
       }
+      )
     }
   )
 }
