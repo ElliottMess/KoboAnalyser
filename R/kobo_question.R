@@ -92,34 +92,31 @@ kobo_question <- function(question,mainDir='') {
                 names(frequ)<- c("Var1","Freq")
 
                 frequ$freqper <- as.numeric(frequ$Freq/sum(frequ$Freq))
-
+                frequ$Var1 = str_wrap(frequ$Var1,width=15)
 
 
                 totalanswer <- nrow(data.single)
 
-                count_replied <- (sum(!is.na(data.single[1])))
+                count_replied <- (sum(!is.na(data.single[,1 ])))
 
                 percentresponse <- paste(round((count_replied/totalanswer*100),digits=2),"%",sep="")
 
-                if (is.na(ordinal)==T | ordinal!="" ){
+                if (is.na(ordinal)==T | ordinal==""){
                   frequ$Var1<-factor(frequ$Var1, levels = frequ$Var1[order(frequ$freqper)])
                 }else{
                   ordinal_choices <- as.character(selectchoices_questions[selectchoices_questions$qname==variablename,c("labelchoice")])
                   frequ$Var1 <- reorder.factor(frequ$Var1, new.order=ordinal_choices)
                   frequ %>% arrange(Var1)
                 }
-                frequ_print <- frequ
-                frequ$Var1 = str_wrap(frequ$Var1,width=15)
 
-
-                theme_set(theme_gray(base_size = 10))
+                theme_set(theme_gray(base_size = 20))
                 color<-"#2a87c8"
 
 
                 ## and now the graph
                 plotfreq <- ggplot(frequ, aes(x= Var1, y=freqper)) +
                   geom_bar(fill=color,colour=color,stat = "identity") +
-                  geom_text(aes(label=paste(round(frequ$freqper*100),"%",sep=""), hjust = -0.2))+
+                  geom_text(aes(label=paste(round(frequ$freqper*100),"%",sep=""), hjust = -0.5))+
                   #facet_wrap(~subgov, ncol=4) +
                   ylab("Frequency") +
                   scale_y_continuous(labels=percent, limits = c(0,1))+
@@ -128,13 +125,13 @@ kobo_question <- function(question,mainDir='') {
                   coord_flip() +
                   ggtitle(str_wrap(title,width=50))+
                   theme( plot.title=element_text(face="bold", size=14),
-                        plot.background = element_rect(fill = "transparent",colour = NA))
+                         plot.background = element_rect(fill = "transparent",colour = NA))
                 cat("\n")
                 print(plotfreq)
                 cat("\n")
-                frequ_print$freqper <- round(frequ$freqper*100,2)
-                names(frequ_print) <- c("Choices","# answered", "% answered")
-                print(kable(frequ_print))
+                frequ$freqper <- round(frequ$freqper*100,2)
+                names(frequ) <- c("Choices","# answered", "% answered")
+                print(kable(frequ))
                 cat("\n")
                 cat(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
                 cat("\n")
@@ -254,6 +251,7 @@ kobo_question <- function(question,mainDir='') {
                             }
 
                             frequ$freqper <- frequ$Freq/count_replied
+                            frequ$data = str_wrap(frequ$data,width=15)
                             frequ <- frequ[frequ$facet!=facetlabel,c("data","facet", "Freq","freqper")]
 
 
@@ -268,9 +266,6 @@ kobo_question <- function(question,mainDir='') {
                               frequ$data <- reorder.factor(frequ$Var1, new.order=ordinal_choices)
                               frequ %>% arrange(data)
                             }
-
-                            frequ_print <- frequ
-                            frequ$data = str_wrap(frequ$data,width=15)
 
 
                             ## and now the graph
@@ -296,9 +291,9 @@ kobo_question <- function(question,mainDir='') {
                             cat("\n")
                             print(bar_one_facet_plot)
                             cat("\n")
-                            frequ_print$freqper <- round(frequ$freqper*100,2)
-                            names(frequ_print) <- c("Choices","Disaggregation", "# answered", "% answered")
-                            print(kable(frequ_print))
+                            frequ$freqper <- round(frequ$freqper*100,2)
+                            names(frequ) <- c("Choices","Disaggregation", "# answered", "% answered")
+                            print(kable(frequ))
                             cat("\n")
                             cat(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
                             cat("\n")
@@ -463,7 +458,7 @@ kobo_question <- function(question,mainDir='') {
 
   }
   # Select_multiple question without disaggregation
-  if(select_question$type=="select_multiple_d" & select_question$disaggregation==""){
+  if(select_question$type=="select_multiple_d" & select_question$disaggregation!=""){
 
     ### Verify that those variables are actually in the original dataframe
     check <- as.data.frame(names(data))
@@ -491,8 +486,7 @@ kobo_question <- function(question,mainDir='') {
       if(length(selectfacet)==0) {
         cat("There's no variable to disaggregate in your data analysis plan.\n")
 
-      } else {  cat(paste0( length(selectfacet) , " variable(s) to disaggregate in your data analysis plan. Let's proceed! \n"))
-
+      } else {
         selectmulti <- as.character(selectdf[, c("fullname")])
         listname <- as.character(selectdf$listname)
         selectmultichoices <- as.character(dico[dico$type=="select_multiple" & dico$listname==listname,c("fullname")])
@@ -610,7 +604,7 @@ kobo_question <- function(question,mainDir='') {
                   names(background_rect) <- c("variable")
                   background_rect$freqper <-1
 
-                  theme_set(theme_gray(base_size = 20)
+                  theme_set(theme_gray(base_size = 10)
                   )
 
                   bar_multi_disagg <- ggplot(castdata,aes(x=variable, y=freqper)) +
@@ -622,7 +616,7 @@ kobo_question <- function(question,mainDir='') {
                     scale_fill_brewer(name=paste0(facetlabel),palette="PuBu")+
                     coord_flip()+
                     ggtitle(str_wrap(listlabel,width=50))+
-                    theme(plot.title=element_text(face="bold", size=25))
+                    theme(plot.title=element_text(face="bold", size=14))
 
                   cat("\n")
                   print(bar_multi_disagg)

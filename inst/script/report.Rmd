@@ -1,6 +1,15 @@
 ---
 output:
-  word_document: default
+  word_document:
+    fig_caption: yes
+    fig_height: 5
+    fig_width: 10
+    toc: yes
+    toc_depth: 2
+    reference_docx: report_template.docx
+
+
+  
 ---
 
 
@@ -30,6 +39,8 @@ output:
     fig_width: 10
     toc: yes
     toc_depth: 2
+    reference_docx: report_template.docx
+
 ---
 
 
@@ -63,7 +74,7 @@ else{
     question<- as.character(chapter_questions[k,"fullname"])
     question_label <- as.character(chapter_questions[k,"label"])
     cat("\n")
-    cat(question_label)
+    cat(paste0("#### ",question_label))
     cat("\n")
     kobo_question(question = question, mainDir=mainDir)
     cat("\n")
