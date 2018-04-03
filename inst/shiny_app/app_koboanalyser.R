@@ -120,9 +120,11 @@ ui <-
       fluidRow(
 
         h2("Information about the report"),
-        column(10,
+        column(5,
         textInput("report_name", "Name of the report"),
-        textInput("location", "Where is the report written"),
+        textInput("location", "Where is the report written")
+        ),
+        column(5,
         textInput("author", "What is your name (author)?"),
         textInput("organisation", "What is your organisation?")
         )
