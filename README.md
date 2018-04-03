@@ -105,7 +105,6 @@ Here are a few introductions and tutorials for  R:
 * An introduction to R: complete but not very user-friendly: https://cran.r-project.org/doc/manuals/r-release/R-intro.html
 *	Try R: http://tryr.codeschool.com/
 *	Data Camp's Introduction to R: https://www.datacamp.com/courses/free-introduction-to-r
-*	Data Camp’s Introduction to R: https://www.datacamp.com/courses/free-introduction-to-r
 
 To go further:
 *	https://www.rstudio.com/online-learning/
