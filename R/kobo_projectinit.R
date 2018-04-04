@@ -97,6 +97,11 @@ kobo_projectinit <- function() {
   if (!file.exists(destfile)) {
     file.copy(paste(path_correct,"/KoboAnalyser/script//report.Rmd",sep=""), destfile)
   }
+  destfile=paste0(mainDir,"/code/report_template.docx")
+  if (!file.exists(destfile)) {
+    file.copy(paste(path_correct,"/KoboAnalyser/script//report_template.docx",sep=""), destfile)
+  }
+
 
   subsubDir <- "shiny_app"
   if (file.exists(paste(mainDir, subDir,"/",subsubDir,"/", sep = "/", collapse = "/"))) {

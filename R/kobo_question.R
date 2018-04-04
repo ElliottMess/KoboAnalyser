@@ -34,7 +34,8 @@ kobo_question <- function(question,mainDir='') {
 
   #   select_one, no disaggregation
 
-  if(select_question$type=="select_one" & select_question$disaggregation==""){
+  if(select_question$type=="select_one" & is.na(select_question$disaggregation) ){
+
             ## Check that variable is in the dataset
 
             check <- as.data.frame(names(data))
@@ -139,7 +140,7 @@ kobo_question <- function(question,mainDir='') {
   }
 
   # Select_one question with disaggregation
-  if(select_question$type=="select_one" & select_question$disaggregation!=""){
+  if(select_question$type=="select_one" & is.na(select_question$disaggregation)==F){
                   check <- as.data.frame(names(data))
                   names(check)[1] <- "fullname"
                   check$id <- row.names(check)
@@ -306,7 +307,7 @@ kobo_question <- function(question,mainDir='') {
     }
 
   # Select_multiple question without disaggregation
-  if(select_question$type=="select_multiple_d" & select_question$disaggregation==""){
+  if(select_question$type=="select_multiple_d" & is.na(select_question$disaggregation)){
 
     selectdf <- dico[dico$type == "select_multiple" & dico$listname==select_question$listname, c("fullname","listname","label","name","disaggregation"), ]
 
@@ -458,7 +459,7 @@ kobo_question <- function(question,mainDir='') {
 
   }
   # Select_multiple question without disaggregation
-  if(select_question$type=="select_multiple_d" & select_question$disaggregation!=""){
+  if(select_question$type=="select_multiple_d" & is.na(select_question$disaggregation)==F){
 
     ### Verify that those variables are actually in the original dataframe
     check <- as.data.frame(names(data))
