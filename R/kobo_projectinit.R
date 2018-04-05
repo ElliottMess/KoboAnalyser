@@ -101,6 +101,11 @@ kobo_projectinit <- function() {
   if (!file.exists(destfile)) {
     file.copy(paste(path_correct,"/KoboAnalyser/script//report_template.docx",sep=""), destfile)
   }
+  destfile=paste0(mainDir,"/code/XLSform_template.xlsx")
+  if (!file.exists(destfile)) {
+    file.copy(paste(path_correct,"/KoboAnalyser/script//XLSform_template.xlsx",sep=""), destfile)
+  }
+
 
 
   subsubDir <- "shiny_app"

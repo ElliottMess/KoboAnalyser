@@ -1,0 +1,12 @@
+name: koboanalyser
+title: koboanalyser
+username:
+account: koboanalyser
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 315823
+bundleId: 1303232
+url: https://koboanalyser.shinyapps.io/koboanalyser/
+when: 1522904433.4318
+asMultiple: FALSE
+asStatic: FALSE

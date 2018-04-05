@@ -61,6 +61,7 @@ kobo_shiny("app_koboanalyser.R")
 ```
 
 This will launch a graphic interface with other instructions and options.
+For better performances, select "Open in Browser" on the top of the window.
 
 ## Troubleshooting
 
