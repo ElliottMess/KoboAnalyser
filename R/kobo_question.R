@@ -28,13 +28,15 @@ kobo_question <- function(question,mainDir='') {
     mainDir <- getwd()
   }
   source(paste0(mainDir,"/code/0-config.R"), local=TRUE)
-  data <- read_excel(path.to.data, sheet=sheet)
   select_question <- dico[dico$fullname==question & dico$formpart=="questions", c("type","fullname","listname","label","name","disaggregation","labelchoice","ordinal")]
+  select_question[select_question==""] <- NA
+
   variablename <- as.character(select_question$fullname)
+
 
   #   select_one, no disaggregation
 
-  if(select_question$type=="select_one" & is.na(select_question$disaggregation) ){
+  if(select_question$type=="select_one" && is.na(select_question$disaggregation) ){
 
             ## Check that variable is in the dataset
 
@@ -84,8 +86,8 @@ kobo_question <- function(question,mainDir='') {
               ordinal <- as.character(select_question$ordinal)
 
 
-                if (usedweight=="sampling_frame"){
-                  frequ <- data.frame(svytable(~variablename, surveydesign))
+                if (usedweight=="sampling_frame" ){
+                    frequ <- as.data.frame(svytable(as.formula(paste0("~",colnames(data[variablename]))),design))
                 }
                 else{
                   frequ<-data.frame(table(data.single[1]))
@@ -93,6 +95,7 @@ kobo_question <- function(question,mainDir='') {
                 names(frequ)<- c("Var1","Freq")
 
                 frequ$freqper <- as.numeric(frequ$Freq/sum(frequ$Freq))
+                frequ_print <- frequ
                 frequ$Var1 = str_wrap(frequ$Var1,width=15)
 
 
@@ -130,9 +133,9 @@ kobo_question <- function(question,mainDir='') {
                 cat("\n")
                 print(plotfreq)
                 cat("\n")
-                frequ$freqper <- round(frequ$freqper*100,2)
-                names(frequ) <- c("Choices","# answered", "% answered")
-                print(kable(frequ))
+                frequ_print$freqper <- round(frequ$freqper*100,2)
+                names(frequ_print) <- c("Choices","# answered", "% answered")
+                print(kable(frequ_print))
                 cat("\n")
                 cat(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
                 cat("\n")
@@ -186,7 +189,7 @@ kobo_question <- function(question,mainDir='') {
 
                     single.facet <- as.data.frame(table(selectfacett[,2]))
                     single.facet <- as.data.frame(single.facet[single.facet$Var1!="",c("Var1")])
-                    names(single.facet) <- "Var1"
+                    names(single.facet) <- "Vsar1"
 
 
                     ## loop around the list of variables to facet
@@ -213,7 +216,6 @@ kobo_question <- function(question,mainDir='') {
                         if(sum(is.na(data.single[,i])==nrow(data.single[,i]))){ cat("passing \n")
                         } else {
 
-                          variablename <- names(data.single)[i]
                           ordinal <- as.character(dico[dico$fullname==facetname,c("ordinal")])
 
                           title <- attributes(data.single)$variable.labels[i]
@@ -226,7 +228,7 @@ kobo_question <- function(question,mainDir='') {
                             #  str(data.single)
                             data.single[facetname]<- data[facetname]
 
-                            data.singlefacet <- as.data.frame(data.single[,c(facetname)])
+                            data.singlefacet <- data.frame(data.single[,c(facetname)], stringsAsFactors=F)
                             names(data.singlefacet)[1] <- facetname
                             data.singlefacet$data <- data.single[,i]
 
@@ -237,7 +239,7 @@ kobo_question <- function(question,mainDir='') {
                             data.singlefacet[,1] <- data.frame(facetchoices[,2][match(data.singlefacet[,1],facetchoices[,1])], stringsAsFactors = FALSE)
 
                             if (usedweight=="sampling_frame"){
-                              frequ <- data.frame(svytable(~data.singlefacet[["data"]]+data.singlefacet[[facetname]], surveydesign))
+                              frequ <- as.data.frame(svytable(as.formula(paste0("~",colnames(data[variablename]),"+",colnames(data[facetname]))),design))
                               names(frequ)[1] <- "data"
                               names(frequ)[2] <- "facet"
 
@@ -252,7 +254,6 @@ kobo_question <- function(question,mainDir='') {
                             }
 
                             frequ$freqper <- frequ$Freq/count_replied
-                            frequ$data = str_wrap(frequ$data,width=15)
                             frequ <- frequ[frequ$facet!=facetlabel,c("data","facet", "Freq","freqper")]
 
 
@@ -267,6 +268,8 @@ kobo_question <- function(question,mainDir='') {
                               frequ$data <- reorder.factor(frequ$Var1, new.order=ordinal_choices)
                               frequ %>% arrange(data)
                             }
+                            frequ_print <- frequ
+                            frequ$data = str_wrap(frequ$data,width=15)
 
 
                             ## and now the graph
@@ -292,9 +295,9 @@ kobo_question <- function(question,mainDir='') {
                             cat("\n")
                             print(bar_one_facet_plot)
                             cat("\n")
-                            frequ$freqper <- round(frequ$freqper*100,2)
-                            names(frequ) <- c("Choices","Disaggregation", "# answered", "% answered")
-                            print(kable(frequ))
+                            frequ_print$freqper <- round(frequ$freqper*100,2)
+                            names(frequ_print) <- c("Choices","Disaggregation", "# answered", "% answered")
+                            print(kable(frequ_print))
                             cat("\n")
                             cat(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
                             cat("\n")
@@ -420,7 +423,7 @@ kobo_question <- function(question,mainDir='') {
             #castdata$variable<-factor(castdata$variable, levels = castdata$variable[order(castdata$freqper)])
 
             castdata <- arrange(castdata,freqper)
-            castdata_print <- castdata
+            castdata_print <- castdata[,c("variable","Freq","freqper")]
             castdata$variable = str_wrap(castdata$variable,width=15)
             castdata$variable <- factor(castdata$variable, levels=castdata$variable)
 
@@ -706,7 +709,6 @@ kobo_question <- function(question,mainDir='') {
     }
   }
   }
-
 
 
 

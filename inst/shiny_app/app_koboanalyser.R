@@ -217,6 +217,9 @@ server <- function(input, output,session) {
     cat("\n")
     cat(paste('sheet <- "',inFile_sheet,'"',sep=""))
     cat("\n")
+    cat("\n")
+    cat(paste0('data <- read_excel("',path.to.data,'", sheet="',inFile_sheet,'")'))
+    cat("\n")
     cat("### 1. Weighting system   ###\n")
     cat(paste("usedweight<-'",inFile_weight,"'",sep=""))
     cat("\n")
@@ -305,7 +308,7 @@ server <- function(input, output,session) {
 
 
   output$report <- downloadHandler(
-    filename = "report.doc",
+    filename = "report.docx",
     content = function(file) {
         withProgress(message="Preparing report",{
             file.copy(paste0(mainDir,"/code/report.Rmd"), paste0(mainDir,"/out"),overwrite = TRUE)

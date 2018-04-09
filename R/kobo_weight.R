@@ -25,7 +25,6 @@ kobo_weight <- function(mainDir = '') {
   source(paste0(mainDir, "/code/0-config.R"), local = TRUE)
 
   sampling <- read_excel(path.to.form, sheet = "sampling_frame")
-  data <- read_excel(path.to.data, sheet = sheet)
 
 
   data$weight <- ""
@@ -121,33 +120,33 @@ kobo_weight <- function(mainDir = '') {
                                 data=data)")
 
 
-        weight2dico <- data.frame(matrix("weight", ncol = 13))
-        names(weight2dico) <-
-          c(
-            "type",
-            "name",
-            "fullname",
-            "label",
-            "disaggregation",
-            "correlate",
-            "listname",
-            "qlevel",
-            "qgroup",
-            "labelchoice",
-            "ordinal",
-            "weight",
-            "formpart"
-          )
-        dico <- rbind(dico, weight2dico)
-
-        # Rewritting dico file
-        write.csv(
-          dico,
-          paste0("data/dico_", form, ".csv"),
-          row.names = FALSE,
-          na = ""
-        )
-
+        # weight2dico <- data.frame(matrix("weight", ncol = 13))
+        # names(weight2dico) <-
+        #   c(
+        #     "type",
+        #     "name",
+        #     "fullname",
+        #     "label",
+        #     "disaggregation",
+        #     "correlate",
+        #     "listname",
+        #     "qlevel",
+        #     "qgroup",
+        #     "labelchoice",
+        #     "ordinal",
+        #     "weight",
+        #     "formpart"
+        #   )
+        # dico <- rbind(dico, weight2dico)
+        #
+        # # Rewritting dico file
+        # write.csv(
+        #   dico,
+        #   paste0(mainDir,"/data/dico_", form, ".csv"),
+        #   row.names = FALSE,
+        #   na = ""
+        # )
+        #
         # Coherce data to a clean dataframe
         data <- data.frame(data)
 
