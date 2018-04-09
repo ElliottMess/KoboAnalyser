@@ -150,13 +150,10 @@ kobo_weight <- function(mainDir = '') {
         # Coherce data to a clean dataframe
         data <- data.frame(data)
 
-        #Rewrite data with weights
-        wb <- loadWorkbook(path.to.data)
-        sheets <- getSheets(wb)
-        removeSheet(wb, sheetName = "cleaned_data")
-        new_sheet <- createSheet(wb, sheetName = "cleaned_data")
-        addDataFrame(data, new_sheet, row.names = FALSE)
-        saveWorkbook(wb, path.to.data)
+        #Write data with weights
+        write.csv(data, file = paste0(mainDir,"/data/data.csv"), overwright)
+
+        path.to.data <- paste0(mainDir, "/data/data.csv")
 
         #Fetching the directory
         #Path to file
@@ -165,14 +162,7 @@ kobo_weight <- function(mainDir = '') {
         sink(configfile, append = TRUE)
 
         cat("\n")
-        cat(
-          paste(
-            'data <- read_excel("',
-            path.to.data,
-            '", sheet="cleaned_data")',
-            sep = ""
-          )
-        )
+        cat(paste0('data <- read.csv("',path.to.data,'")'))
 
         cat("\n")
         cat(paste('strata1 <- "', fullname_strata, '"', sep = ""))

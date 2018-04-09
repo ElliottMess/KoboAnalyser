@@ -310,7 +310,7 @@ server <- function(input, output,session) {
   output$report <- downloadHandler(
     filename = "report.docx",
     content = function(file) {
-        withProgress(message="Preparing report",{
+        withProgress(message="Preparing report...",value=0,{
             file.copy(paste0(mainDir,"/code/report.Rmd"), paste0(mainDir,"/out"),overwrite = TRUE)
             tempReport<- paste0(mainDir,"/code/report.Rmd")
         # Knit the document, passing in the `params` list, and eval it in a
