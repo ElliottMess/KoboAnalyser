@@ -151,7 +151,7 @@ kobo_weight <- function(mainDir = '') {
         data <- data.frame(data)
 
         #Write data with weights
-        write.csv(data, file = paste0(mainDir,"/data/data.csv"), overwright)
+        write.csv(data, file = paste0(mainDir,"/data/data.csv"))
 
         path.to.data <- paste0(mainDir, "/data/data.csv")
 

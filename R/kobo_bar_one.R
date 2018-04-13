@@ -27,7 +27,6 @@ kobo_bar_one <- function(mainDir='') {
   }
 
   source(paste0(mainDir,"/code/0-config.R"), local=TRUE)
-  data <- read_excel(path.to.data, sheet=sheet)
 
 
   ## Check that variable are in the dataset

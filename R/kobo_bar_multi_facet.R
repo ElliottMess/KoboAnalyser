@@ -30,7 +30,6 @@ kobo_bar_multi_facet <- function(mainDir='') {
   }
 
   source(paste0(mainDir,"/code/0-config.R"), local=TRUE)
-  data <- read_excel(path.to.data, sheet=sheet)
 
 
   # List of select_multiple questions and choices

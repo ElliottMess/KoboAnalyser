@@ -107,7 +107,7 @@ kobo_histo <- function(mainDir='') {
   cat(" \n")
   cat(" ###########################################################\n")
   cat(" # The histograms for number questions were generated!     #\n")
-  cat(" # You can find them in the folder 'out/bar_one'!          #\n")
+  cat(" # You can find them in the folder 'out/histo'!            #\n")
   cat(" ###########################################################\n")
 
 

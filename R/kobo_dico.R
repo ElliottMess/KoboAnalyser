@@ -27,7 +27,6 @@ kobo_dico <- function(mainDir='') {
   }
 
   source(paste0(mainDir,"/code/0-config.R"), local=TRUE)
-  data <- read_excel(path.to.data, sheet=sheet)
   # read the survey tab of ODK from
   form_tmp <- paste0(mainDir, "/data/",form)
 

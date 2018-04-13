@@ -33,7 +33,7 @@ kobo_question <- function(question,mainDir='') {
 
   variablename <- as.character(select_question$fullname)
 
-
+  colour_palette <- brewer.pal(n=9,"PuBu")[9:3]
   #   select_one, no disaggregation
 
   if(select_question$type=="select_one" && is.na(select_question$disaggregation) ){
@@ -88,6 +88,9 @@ kobo_question <- function(question,mainDir='') {
 
                 if (usedweight=="sampling_frame" ){
                     frequ <- as.data.frame(svytable(as.formula(paste0("~",colnames(data[variablename]))),design))
+                    frequ[,1] <- selectchoices_questions$labelchoice[match(frequ[,1], selectchoices_questions$name)]
+                    frequ[,1] <- factor(frequ[,1])
+
                 }
                 else{
                   frequ<-data.frame(table(data.single[1]))
@@ -109,6 +112,7 @@ kobo_question <- function(question,mainDir='') {
                   frequ$Var1<-factor(frequ$Var1, levels = frequ$Var1[order(frequ$freqper)])
                 }else{
                   ordinal_choices <- as.character(selectchoices_questions[selectchoices_questions$qname==variablename,c("labelchoice")])
+                  frequ$Var1 <- as.character(frequ$Var1)
                   frequ$Var1 <- reorder.factor(frequ$Var1, new.order=ordinal_choices)
                   frequ %>% arrange(Var1)
                 }
@@ -120,16 +124,14 @@ kobo_question <- function(question,mainDir='') {
                 ## and now the graph
                 plotfreq <- ggplot(frequ, aes(x= Var1, y=freqper)) +
                   geom_bar(fill=color,colour=color,stat = "identity") +
-                  geom_text(aes(label=paste(round(frequ$freqper*100),"%",sep=""), hjust = -0.5))+
+                  geom_text(aes(label=paste(round(frequ$freqper*100),"%",sep=""), hjust = -0.3))+
                   #facet_wrap(~subgov, ncol=4) +
                   ylab("Frequency") +
-                  scale_y_continuous(labels=percent, limits = c(0,1))+
-                  scale_fill_brewer("PuBu")+
+                  scale_y_continuous(labels=percent, limits = c(0,1),expand = c(0,0))+
+                  scale_fill_manual(values=colour_palette)+
                   xlab("") +
                   coord_flip() +
-                  ggtitle(str_wrap(title,width=50))+
-                  theme( plot.title=element_text(face="bold", size=14),
-                         plot.background = element_rect(fill = "transparent",colour = NA))
+                  theme( plot.background = element_rect(fill = "transparent",colour = NA))
                 cat("\n")
                 print(plotfreq)
                 cat("\n")
@@ -155,13 +157,11 @@ kobo_question <- function(question,mainDir='') {
 
 
                   # Replacing names by labels
-                  selectchoices_questions <- dico[dico$type=="select_one_d"  , c("listname","name","labelchoice")]
-                  selectchoices <- unique(dico[dico$type=="select_one_d"  , c("listname","name","labelchoice")])
+                  selectoneans <-(dico[dico$type=="select_one_d", c("fullname","name","listname","labelchoice")])
+                  selectoneans$qname <- paste(sapply(strsplit(as.character(selectoneans$fullname),".",fixed = TRUE),"[[",1), sapply(strsplit(as.character(selectoneans$fullname),".",fixed = TRUE),"[[",2), sep = ".")
+                  selectchoices_questions <- selectoneans[selectoneans$qname==variablename, ]
 
-                  selectoneans <-(dico[dico$type=="select_one_d", c("fullname","name","listname")])
-                  short_ans <- paste(sapply(strsplit(as.character(selectoneans$fullname),".",fixed = TRUE),"[[",1), sapply(strsplit(as.character(selectoneans$fullname),".",fixed = TRUE),"[[",2), sep = ".")
-                  selectchoices_questions$qname <- short_ans
-
+                  selectchoices <- selectchoices_questions[,c("listname","name","labelchoice")]
 
                   data.single <- data.frame(data [selectone])
 
@@ -240,6 +240,10 @@ kobo_question <- function(question,mainDir='') {
 
                             if (usedweight=="sampling_frame"){
                               frequ <- as.data.frame(svytable(as.formula(paste0("~",colnames(data[variablename]),"+",colnames(data[facetname]))),design))
+                              frequ[,1] <- selectchoices_questions$labelchoice[match(frequ[,1], selectchoices_questions$name)]
+                              frequ[,1] <- factor(frequ[,1])
+                              frequ[,2] <- factor(frequ[,2])
+
                               names(frequ)[1] <- "data"
                               names(frequ)[2] <- "facet"
 
@@ -252,9 +256,12 @@ kobo_question <- function(question,mainDir='') {
 
 
                             }
+                            freqperfacet <- ddply(frequ,"facet", function(frequ) c("freqfacet"=sum(frequ$Freq)))
+                            frequ<- merge(frequ, freqperfacet, id="facet")
 
-                            frequ$freqper <- frequ$Freq/count_replied
-                            frequ <- frequ[frequ$facet!=facetlabel,c("data","facet", "Freq","freqper")]
+
+                            frequ$freqper <- frequ$Freq/frequ$freqfacet
+                            frequ <- frequ[frequ$facet!=facetlabel,]
 
 
                             percentresponse <- paste(round(sum(!is.na(data.single[,i ]))/nrow(data.single)*100,digits=2 ),"%")
@@ -263,13 +270,17 @@ kobo_question <- function(question,mainDir='') {
 
                             if (is.na(ordinal)==T | ordinal==""){
                               frequ<-frequ[with(frequ,order(freqper)),]
+                              frequ_print <- frequ
+                              frequ$data = str_wrap(frequ$data,width=15)
+                              frequ<-frequ[with(frequ,order(freqper)),]
                             }else{
                               ordinal_choices <- as.character(selectchoices_questions[selectchoices_questions$qname==variablename,c("labelchoice")])
-                              frequ$data <- reorder.factor(frequ$Var1, new.order=ordinal_choices)
+                              frequ$data <- reorder.factor(frequ$data, new.order=ordinal_choices)
                               frequ %>% arrange(data)
+                              frequ_print <- frequ
+                              frequ$data = str_wrap(frequ$data,width=15)
+
                             }
-                            frequ_print <- frequ
-                            frequ$data = str_wrap(frequ$data,width=15)
 
 
                             ## and now the graph
@@ -284,13 +295,11 @@ kobo_question <- function(question,mainDir='') {
                             bar_one_facet_plot <- ggplot(frequ,aes(x=data, y=freqper)) +
                               geom_bar(data=background_rect,aes(x=data),stat = "identity", alpha=0.2)+
                               geom_bar(stat = "identity", position="dodge",aes(fill=facet))+
-                              geom_text(aes(label=paste(round(freqper*100),"%",sep=""), fill=facet, hjust = -0.5), position=position_dodge(width=0.8))+
+                              geom_text(aes(label=paste(round(freqper*100),"%",sep=""), fill=facet, hjust = -0.3), position=position_dodge(width=0.8))+
                               xlab("") + ylab("")+
-                              scale_y_continuous(labels=percent, limits = c(0,1))+
-                              scale_fill_brewer(name=paste0(facetlabel),palette="PuBu")+
-                              coord_flip()+
-                              ggtitle(str_wrap(title,width=50))+
-                              theme(plot.title=element_text(face="bold", size=14))
+                              scale_y_continuous(labels=percent, limits = c(0,1), expand = c(0,0))+
+                              scale_fill_manual(name=paste0(facetlabel),values=colour_palette)+
+                              coord_flip()
                             # Printing graphs
                             cat("\n")
                             print(bar_one_facet_plot)
@@ -299,7 +308,7 @@ kobo_question <- function(question,mainDir='') {
                             names(frequ_print) <- c("Choices","Disaggregation", "# answered", "% answered")
                             print(kable(frequ_print))
                             cat("\n")
-                            cat(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
+                            print(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))
                             cat("\n")
 
                           }
@@ -435,12 +444,10 @@ kobo_question <- function(question,mainDir='') {
               geom_bar(fill="#2a87c8",colour="#2a87c8",stat = "identity") +
               geom_text(aes(label=paste(round(freqper*100),"%",sep=""), hjust = -0.2))+
               xlab("") + ylab("")+
-              scale_y_continuous(labels=percent, limits=c(0,1))+
-              scale_fill_brewer("PuBu")+
+              scale_y_continuous(labels=percent, limits=c(0,1), expand = c(0,0))+
+              scale_fill_manual(values=colour_palette)+
               coord_flip()+
-              ggtitle(str_wrap(listlabel,width=50))+
-              theme(plot.title=element_text(face="bold", size=14),
-                    plot.background = element_rect(fill = "transparent",colour = NA))
+              theme(plot.background = element_rect(fill = "transparent",colour = NA))
             cat("\n")
             print(bar_multi)
             cat("\n")
@@ -586,22 +593,30 @@ kobo_question <- function(question,mainDir='') {
                     castdata <- as.data.frame(table(meltdata[,c("value","variable","facet","weight")]))
                     castdata$Freq <- as.numeric(as.character(castdata$Freq))
                     castdata$weight <- as.numeric(as.character(castdata$weight))
-                    castdata$freqper <- round((castdata$Freq*castdata$weight)/count_replied,digits=2)
+                    castdata <- castdata[castdata$value!=0, ]
+                    freqperfacet <- as.data.frame(table(data.selectmultilist[is.na(data.selectmultilist[,1])==F, c("facet")]))
+                    names(freqperfacet) <- c("facet","freqfacet")
+                    castdata<- merge(castdata, freqperfacet, id="facet")
+                    castdata$freqper <- round((castdata$Freq*castdata$weight)/(castdata$freqfacet*castdata$weight),digits=2)
                   }
 
                   else{
                     meltdata <- melt(data.selectmultilist,id=c("id","facet"))
 
                     castdata <- as.data.frame(table(meltdata[,c("value","variable","facet")]))
-                    castdata$Freq <- as.numeric(as.character(castdata$Freq))
-                    castdata$freqper <- round((castdata$Freq)/count_replied,digits=2)
+                    freqperfacet <- as.data.frame(table(data.selectmultilist[is.na(data.selectmultilist[,1])==F, c("facet")]))
+                    names(freqperfacet) <- c("facet","freqfacet")
+                    castdata<- merge(castdata, freqperfacet, id="facet")
+                    castdata$freqper <- round((castdata$Freq)/(castdata$freqfacet),digits=2)
+
                   }
 
                   castdata <- castdata[castdata$value!=0, ]
 
                   #combining values
                   castdata<- ddply(castdata, c("variable","facet"),numcolwise(sum))
-                  castdata_print <- castdata
+                  castdata_print <- castdata[,c("variable","facet","Freq","freqper")]
+
                   castdata$variable = str_wrap(castdata$variable,width=15)
 
                   background_rect <- data.frame(unique(castdata[,c("variable")]))
@@ -614,14 +629,11 @@ kobo_question <- function(question,mainDir='') {
                   bar_multi_disagg <- ggplot(castdata,aes(x=variable, y=freqper)) +
                     geom_bar(data=background_rect,aes(x=variable),stat = "identity", alpha=0.2)+
                     geom_bar(stat = "identity", position="dodge",aes(fill=facet))+
-                    geom_text(aes(label=paste(round(freqper*100),"%",sep=""), fill=facet, hjust = -0.5), position=position_dodge(width=0.8))+
+                    geom_text(aes(label=paste(round(freqper*100),"%",sep=""), fill=facet, hjust = -0.3), position=position_dodge(width=0.8))+
                     xlab("") + ylab("")+
-                    scale_y_continuous(labels=percent, limits = c(0,1))+
-                    scale_fill_brewer(name=paste0(facetlabel),palette="PuBu")+
-                    coord_flip()+
-                    ggtitle(str_wrap(listlabel,width=50))+
-                    theme(plot.title=element_text(face="bold", size=14))
-
+                    scale_y_continuous(labels=percent, limits = c(0,1), expand = c(0,0))+
+                    scale_fill_manual(name=paste0(facetlabel),values=colour_palette)+
+                    coord_flip()
                   cat("\n")
                   print(bar_multi_disagg)
                   cat("\n")
@@ -690,16 +702,14 @@ kobo_question <- function(question,mainDir='') {
           geom_histogram(aes(y =..density..), fill="#2a87c8", alpha = .6, binwidth=0.5) +
           geom_density(adjust=2) +
           scale_x_continuous(expand = c(0,0)) +
-          ggtitle(str_wrap(title,width=50))+
           labs(x="", y="Frequency")+
-          theme(plot.title=element_text(face="bold", size=14),
-                  plot.background = element_rect(fill = "transparent",colour = NA))
+          theme(plot.background = element_rect(fill = "transparent",colour = NA))
         cat("\n")
         print(histograms)
         cat("\n")
         cat("\n")
-
         names(select.data.integer) <- select_question$label
+        cat("\n")
         print(summary(select.data.integer))
         cat("\n")
         cat(paste0("Out of ", totalanswer," respondents, ", count_replied," (",percentresponse,")"," answered to this question."))

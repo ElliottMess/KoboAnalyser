@@ -30,7 +30,6 @@ kobo_bar_multi <- function(mainDir='') {
   }
 
   source(paste0(mainDir,"/code/0-config.R"), local=TRUE)
-  data <- read_excel(path.to.data, sheet=sheet)
 
   # List of select_multiple questions and choices
   selectdf <- dico[dico$type == "select_multiple", c("fullname","listname","label","name","disaggregation"), ]

@@ -29,7 +29,6 @@ kobo_bar_one_facet <- function(mainDir='') {
   }
 
   source(paste0(mainDir,"/code/0-config.R"), local=TRUE)
-  data <- read_excel(path.to.data, sheet=sheet)
 
 
   mainDirectory <- paste0(mainDir,"/out")

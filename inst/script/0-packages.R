@@ -24,7 +24,7 @@ packages <- c(
   #"ggthemes", ## Customised themes for ggplot2: excel, stata, economist, tufte, wall street journal...
   "grid", "gridExtra", # Assembel graphcis together
   #"vcd", # Visualisation of categorical data
-  #"RColorBrewer", # a package offering color palette from
+  "RColorBrewer", # a package offering color palette from
   "scales", #Scale Functions for Visualization
   #"extrafont", ##" load additional font
   #"hexbin", ## Hexagrid viz
@@ -154,7 +154,7 @@ library("ggplot2") ## The grammar of graphics!
 library("ggthemes") ## Additional themes for gplot2
 #library("zoo") ## Manage reformatting of date
 library("reshape2") ## Restructure data between wide and long format before plotting them - melt and cast
-#library("RColorBrewer") ## Color palette
+library("RColorBrewer") ## Color palette
 #library("classInt") ## Classififcation
 #library("hexbin") ## Hexa binning
 #library("lubridate")
